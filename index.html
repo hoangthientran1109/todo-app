@@ -536,6 +536,112 @@
               font-size: 14px;
               padding: 20px 0;
           }
+/* Toolbar dưới thanh lọc */
+          .toolbar {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin: 8px 0 4px;
+              gap: 8px;
+          }
+
+          .btn-toolbar {
+              padding: 4px 12px;
+              border: 1px solid var(--border-input);
+              border-radius: 8px;
+              background: transparent;
+              font-size: 13px;
+              cursor: pointer;
+              color: var(--text-sub);
+              transition: all 0.15s;
+              white-space: nowrap;
+          }
+
+          .btn-toolbar:hover {
+              border-color: var(--text-main);
+              color: var(--text-main);
+          }
+
+          .btn-toolbar.nguy-hiem:hover {
+              background-color: #e74c3c;
+              border-color: #e74c3c;
+              color: white;
+          }
+
+          select.chon-sap-xep {
+              padding: 4px 10px;
+              border: 1px solid var(--border-input);
+              border-radius: 8px;
+              background: transparent;
+              font-size: 13px;
+              cursor: pointer;
+              color: var(--text-sub);
+              width: auto;
+          }
+
+          select.chon-sap-xep:focus { outline: none; }
+ /* =====================
+             MOBILE RESPONSIVE
+          ===================== */
+          @media (max-width: 480px) {
+              body {
+                  padding: 0;
+                  align-items: flex-start;
+              }
+
+              .container {
+                  border-radius: 0;
+                  padding: 16px;
+                  min-height: 100vh;
+                  box-shadow: none;
+              }
+
+              h1 { font-size: 18px; }
+
+              /* Deadline + danh sách xếp dọc */
+              .input-row.hang-2 {
+                  flex-direction: column;
+              }
+
+              /* Toolbar xếp dọc */
+              .toolbar {
+                  flex-direction: column;
+                  align-items: stretch;
+              }
+
+              .toolbar > div {
+                  display: flex;
+                  gap: 6px;
+              }
+
+              .toolbar > div button {
+                  flex: 1;
+              }
+
+              select.chon-sap-xep {
+                  width: 100%;
+              }
+
+              /* Thanh lọc cuộn ngang */
+              .bo-loc {
+                  flex-wrap: nowrap;
+                  overflow-x: auto;
+                  padding-bottom: 4px;
+                  -webkit-overflow-scrolling: touch;
+              }
+
+              .btn-loc { white-space: nowrap; }
+
+              /* Task item gọn hơn */
+              li { font-size: 14px; padding: 8px 10px; }
+
+              /* Tabs to hơn dễ bấm */
+              .tab { padding: 10px 16px; }
+
+              /* Lịch ô nhỏ hơn */
+              .lich-so { font-size: 12px; }
+              .cham { width: 4px; height: 4px; }
+          }
       </style>
   </head>
   <body>
@@ -586,12 +692,25 @@
                   >
               </div>
 
-              <div class="bo-loc">
+              <div class="bo-loc" id="bo-loc">
                   <button class="btn-loc active" onclick="locTheo('tat-ca', this)">Tất cả</button>
                   <button class="btn-loc" onclick="locTheo('Work', this)">Work</button>
                   <button class="btn-loc" onclick="locTheo('Study', this)">Study</button>
                   <button class="btn-loc" onclick="locTheo('Health', this)">Health</button>
                   <button class="btn-loc" onclick="locTheo('Entertainment', this)">Entertainment</button>
+              </div>
+
+              <div class="toolbar">
+                  <div style="display:flex; gap:6px;">
+                      <button class="btn-toolbar nguy-hiem" onclick="xoaTatCaHoanThanh()">✕ Xóa đã hoàn thành</button>
+                      <button class="btn-toolbar nguy-hiem" onclick="xoaTatCa()">✕ Xóa tất cả</button>
+                  </div>
+                  <select class="chon-sap-xep" id="chon-sap-xep" onchange="veGiaoDien()">
+                      <option value="mac-dinh">Sắp xếp: Mặc định</option>
+                      <option value="deadline">Deadline gần nhất</option>
+                      <option value="ten-az">Tên A → Z</option>
+                      <option value="ten-za">Tên Z → A</option>
+                  </select>
               </div>
 
               <p class="dem-cong-viec" id="dem">Chưa có công việc nào</p>
@@ -684,7 +803,9 @@
               let container = document.getElementById("danh-sach");
               container.innerHTML = "";
 
-              let daDuocLoc = layDanhSachDaLoc();
+              capNhatSoLuongLoc(); // cập nhật số trên thanh lọc
+
+              let daDuocLoc = layDanhSachDaSapXep(layDanhSachDaLoc());
               if (daDuocLoc.length === 0) { capNhatDem(); return; }
 
               let coDeadline    = daDuocLoc.filter(t => t.deadline);
@@ -1180,6 +1301,83 @@
           }
 
           veGiaoDien();
+// ============================================
+          // XÓA TẤT CẢ ĐÃ HOÀN THÀNH
+          // ============================================
+          function xoaTatCaHoanThanh() {
+              let soHoanThanh = danhSachData.filter(t => t.hoànThành).length;
+              if (soHoanThanh === 0) {
+                  alert("Không có task nào đã hoàn thành!");
+                  return;
+              }
+              if (!confirm("Xóa " + soHoanThanh + " task đã hoàn thành?")) return;
+              danhSachData = danhSachData.filter(t => !t.hoànThành);
+              luuDuLieu();
+              veGiaoDien();
+          }
+
+          // ============================================
+          // SẮP XẾP
+          // ============================================
+          function layDanhSachDaSapXep(ds) {
+              let kieu = document.getElementById("chon-sap-xep").value;
+              let ban = [...ds]; // không sửa mảng gốc
+
+              if (kieu === "deadline") {
+                  return ban.sort(function(a, b) {
+                      if (!a.deadline) return 1;
+                      if (!b.deadline) return -1;
+                      return a.deadline.localeCompare(b.deadline);
+                  });
+              }
+              if (kieu === "ten-az") {
+                  return ban.sort((a, b) => a.tenCongViec.localeCompare(b.tenCongViec, "vi"));
+              }
+              if (kieu === "ten-za") {
+                  return ban.sort((a, b) => b.tenCongViec.localeCompare(a.tenCongViec, "vi"));
+              }
+              return ban; // mặc định giữ nguyên
+          }
+
+          // ============================================
+          // ĐẾM TASK TRÊN THANH LỌC
+          // ============================================
+          function capNhatSoLuongLoc() {
+              let danhSachLoc = [
+                  { value: "tat-ca",        label: "Tất cả" },
+                  { value: "Work",          label: "Work" },
+                  { value: "Study",         label: "Study" },
+                  { value: "Health",        label: "Health" },
+                  { value: "Entertainment", label: "Entertainment" }
+              ];
+
+              danhSachLoc.forEach(function(muc) {
+                  let so;
+                  if (muc.value === "tat-ca") {
+                      so = danhSachData.length;
+                  } else {
+                      so = danhSachData.filter(t => t.danhSach === muc.value).length;
+                  }
+
+                  // Tìm đúng nút theo onclick
+                  let nut = document.querySelector(`.btn-loc[onclick="locTheo('${muc.value}', this)"]`);
+                  if (nut) {
+                      nut.textContent = so > 0
+                          ? muc.label + " (" + so + ")"
+                          : muc.label;
+                  }
+              });
+          }
+function xoaTatCa() {
+              if (danhSachData.length === 0) {
+                  alert("Không có task nào!");
+                  return;
+              }
+              if (!confirm("Xóa toàn bộ " + danhSachData.length + " task? Không thể hoàn tác!")) return;
+              danhSachData = [];
+              luuDuLieu();
+              veGiaoDien();
+          }
       </script>
 
   </body>
