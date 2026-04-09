@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+  <html lang="vi">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">                                                  <title>To-do List của tôi</title>
+                                                                                                                              <style>
+          * { box-sizing: border-box; margin: 0; padding: 0; }
+
+          :root {
+              --bg-page:      #f0f4f8;
+              --bg-card:      #ffffff;
+              --bg-item:      #f9f9f9;
+              --border:       #eee;
+              --border-input: #ddd;
+              --text-main:    #222;
+              --text-sub:     #888;
+              --text-muted:   #aaa;
+              --btn-primary:  #333;
+              --btn-hover:    #555;
+              --shadow:       0 4px 12px rgba(0,0,0,0.1);
+          }
+
+          body.dark {
+              --bg-page:      #1a1a2e;
+              --bg-card:      #16213e;
+              --bg-item:      #0f3460;
+              --border:       #1a4a7a;
+              --border-input: #1a4a7a;
+              --text-main:    #e0e0e0;
+              --text-sub:     #a0a0b0;
+              --text-muted:   #606070;
+              --btn-primary:  #e0e0e0;
+              --btn-hover:    #ffffff;
+              --shadow:       0 4px 12px rgba(0,0,0,0.4);
+          }
+
+          body {
+              font-family: Arial, sans-serif;
+              background-color: var(--bg-page);
+              display: flex;
+              justify-content: center;
+              padding: 40px 20px;
+              min-height: 100vh;
+              transition: background-color 0.3s;
+          }
+
+          .container {
+              background-color: var(--bg-card);
+              padding: 30px;
+              border-radius: 12px;
+              width: 100%;
+              max-width: 500px;
+              box-shadow: var(--shadow);
+              transition: background-color 0.3s;
+          }
+
+          .header {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              position: relative;
+              margin-bottom: 20px;
+          }
+
+          h1 {
+              color: var(--text-main);
+              font-size: 22px;
+              letter-spacing: 1px;
+          }
+
+          .btn-dark-mode {
+              position: absolute;
+              right: 0;
+              background: none;
+              border: 1px solid var(--border-input);
+              border-radius: 8px;
+              padding: 4px 10px;
+              cursor: pointer;
+              font-size: 18px;
+              color: var(--text-main);
+              transition: all 0.2s;
+          }
+
+          .btn-dark-mode:hover {
+              background-color: var(--btn-primary);
+              color: var(--bg-card);
+          }
+
+          /* Tabs */
+          .tabs {
+              display: flex;
+              gap: 0;
+              margin-bottom: 20px;
+              border-bottom: 2px solid var(--border);
+          }
+
+          .tab {
+              padding: 8px 20px;
+              cursor: pointer;
+              font-size: 15px;
+              color: var(--text-sub);
+              border-bottom: 2px solid transparent;
+              margin-bottom: -2px;
+              transition: all 0.15s;
+          }
+
+          .tab:hover { color: var(--text-main); }
+
+          .tab.active {
+              color: var(--text-main);
+              border-bottom: 2px solid var(--text-main);
+              font-weight: bold;
+          }
+
+          .man-hinh { display: none; }
+          .man-hinh.active { display: block; }
+
+          /* Form nhập */
+          .input-block {
+              display: flex;
+              flex-direction: column;
+              gap: 8px;
+              margin-bottom: 8px;
+          }
+
+          .input-row {
+              display: flex;
+              gap: 8px;
+          }
+
+          input[type="text"],
+          input[type="datetime-local"],
+          select {
+              padding: 10px;
+              border: 2px solid var(--border-input);
+              border-radius: 8px;
+              font-size: 15px;
+              color: var(--text-main);
+              background-color: var(--bg-card);
+              transition: border-color 0.2s, background-color 0.3s, color 0.3s;
+              width: 100%;
+              color-scheme: light;
+          }
+
+          body.dark input[type="datetime-local"] {
+              color-scheme: dark;
+          }
+
+          input[type="text"] { flex: 1; }
+
+          input[type="text"]:focus,
+          input[type="datetime-local"]:focus,
+          select:focus {
+              outline: none;
+              border-color: var(--btn-primary);
+          }
+
+          select { cursor: pointer; }
+
+          button.btn-them {
+              padding: 10px 16px;
+              background-color: var(--btn-primary);
+              color: var(--bg-card);
+              border: none;
+              border-radius: 8px;
+              font-size: 15px;
+              cursor: pointer;
+              white-space: nowrap;
+              transition: background-color 0.2s;
+          }
+
+          button.btn-them:hover { background-color: var(--btn-hover); }
+
+          /* Ô tìm kiếm */
+          .o-tim-kiem {
+              position: relative;
+              margin-bottom: 8px;
+          }
+
+          .o-tim-kiem input {
+              width: 100%;
+              padding: 9px 12px 9px 34px;
+              border: 2px solid var(--border-input);
+              border-radius: 8px;
+              font-size: 15px;
+              color: var(--text-main);
+              background-color: var(--bg-card);
+          }
+
+          .o-tim-kiem input:focus {
+              outline: none;
+              border-color: var(--btn-primary);
+          }
+
+          .icon-tim-kiem {
+              position: absolute;
+              left: 10px;
+              top: 50%;
+              transform: translateY(-50%);
+              color: var(--text-sub);
+              font-size: 16px;
+              pointer-events: none;
+          }
+
+          mark.highlight {
+              background-color: yellow;
+              border-radius: 3px;
+              color: #333;
+          }
+
+          body.dark mark.highlight {
+              background-color: #b8860b;
+              color: #fff;
+          }
+
+          /* Thanh lọc */
+          .bo-loc {
+              display: flex;
+              gap: 6px;
+              flex-wrap: wrap;
+              margin: 6px 0 4px;
+          }
+
+          .btn-loc {
+              padding: 4px 12px;
+              border: 1px solid var(--border-input);
+              border-radius: 20px;
+              background: transparent;
+              font-size: 13px;
+              cursor: pointer;
+              color: var(--text-sub);
+              transition: all 0.15s;
+          }
+
+          .btn-loc:hover {
+              border-color: var(--text-main);
+              color: var(--text-main);
+          }
+
+          .btn-loc.active {
+              background-color: var(--btn-primary);
+              color: var(--bg-card);
+              border-color: var(--btn-primary);
+          }
+
+          .dem-cong-viec {
+              text-align: center;
+              color: var(--text-sub);
+              font-size: 13px;
+              margin: 8px 0 0;
+          }
+
+          /* Nhóm ngày */
+          .nhom-ngay { margin-top: 20px; }
+
+          .tieu-de-ngay {
+              font-size: 12px;
+              font-weight: bold;
+              color: var(--text-sub);
+              text-transform: uppercase;
+              letter-spacing: 1px;
+              border-bottom: 1px solid var(--border);
+              padding-bottom: 4px;
+              margin-bottom: 8px;
+          }
+
+          .tieu-de-ngay.hom-nay { color: var(--text-main); }
+          .tieu-de-ngay.qua-han { color: #c0392b; }
+
+          ul { list-style: none; }
+
+          li {
+              display: flex;
+              justify-content: space-between;
+              align-items: flex-start;
+              padding: 10px 12px;
+              background-color: var(--bg-item);
+              border: 1px solid var(--border);
+              border-radius: 8px;
+              margin-top: 6px;
+              font-size: 15px;
+              gap: 8px;
+              transition: background-color 0.3s;
+              cursor: grab;
+          }
+
+          li:active { cursor: grabbing; }
+
+          li.qua-han {
+              border-left: 3px solid #e74c3c;
+              background-color: rgba(231, 76, 60, 0.08);
+          }
+
+          li.dang-keo {
+              opacity: 0.4;
+              border: 2px dashed #999;
+          }
+
+          li.vi-tri-tha {
+              border-top: 3px solid var(--btn-primary);
+          }
+
+          .noi-dung-task {
+              flex: 1;
+              display: flex;
+              flex-direction: column;
+              gap: 4px;
+              cursor: pointer;
+          }
+
+          .ten-cong-viec {
+              font-size: 15px;
+              color: var(--text-main);
+          }
+
+          .ten-cong-viec:hover { opacity: 0.7; }
+
+          .gio-deadline {
+              font-size: 12px;
+              color: var(--text-sub);
+          }
+
+          .gio-deadline.qua-han {
+              color: #e74c3c;
+              font-weight: bold;
+          }
+
+          .badge-ds {
+              display: inline-block;
+              font-size: 11px;
+              padding: 2px 8px;
+              border-radius: 20px;
+              background-color: var(--border);
+              color: var(--text-sub);
+              font-weight: bold;
+          }
+
+          .input-sua {
+              width: 100%;
+              padding: 6px 8px;
+              border: 2px solid var(--btn-primary);
+              border-radius: 6px;
+              font-size: 14px;
+              background-color: var(--bg-card);
+              color: var(--text-main);
+          }
+
+          .input-sua:focus { outline: none; }
+
+          .nhom-nut {
+              display: flex;
+              gap: 6px;
+              align-items: center;
+              flex-shrink: 0;
+          }
+
+          li button {
+              background: none;
+              border: 1px solid var(--border-input);
+              border-radius: 6px;
+              font-size: 15px;
+              cursor: pointer;
+              padding: 2px 7px;
+              color: var(--text-main);
+              line-height: 1.4;
+              transition: all 0.15s;
+          }
+
+          li button:hover {
+              background-color: var(--btn-primary);
+              color: var(--bg-card);
+              border-color: var(--btn-primary);
+          }
+
+          .hoan-thanh .ten-cong-viec {
+              text-decoration: line-through;
+              color: var(--text-muted);
+          }
+
+          .hoan-thanh .gio-deadline { color: var(--text-muted); }
+          .hoan-thanh .badge-ds { opacity: 0.4; }
+
+          /* Lịch */
+          .lich-header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 12px;
+          }
+
+          .lich-header span {
+              font-weight: bold;
+              font-size: 16px;
+              color: var(--text-main);
+          }
+
+          .btn-thang {
+              background: none;
+              border: 1px solid var(--border-input);
+              border-radius: 6px;
+              padding: 4px 10px;
+              cursor: pointer;
+              font-size: 16px;
+              color: var(--text-main);
+              transition: all 0.15s;
+          }
+
+          .btn-thang:hover {
+              background-color: var(--btn-primary);
+              color: var(--bg-card);
+          }
+
+          .lich-grid {
+              display: grid;
+              grid-template-columns: repeat(7, 1fr);
+              gap: 4px;
+          }
+
+          .lich-thu {
+              text-align: center;
+              font-size: 12px;
+              font-weight: bold;
+              color: var(--text-sub);
+              padding: 4px 0;
+          }
+
+          .lich-o {
+              aspect-ratio: 1;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              border-radius: 8px;
+              cursor: pointer;
+              position: relative;
+              transition: background-color 0.15s;
+              gap: 3px;
+          }
+
+          .lich-o:hover { background-color: var(--bg-item); }
+
+          .lich-o.hom-nay { background-color: var(--btn-primary); }
+          .lich-o.hom-nay .lich-so { color: var(--bg-card); }
+
+          .lich-o.dang-chon {
+              background-color: var(--bg-item);
+              border: 2px solid var(--btn-primary);
+          }
+
+          .lich-o.hom-nay.dang-chon {
+              background-color: var(--bg-item);
+              border: 2px solid var(--btn-primary);
+          }
+
+          .lich-o.hom-nay.dang-chon .lich-so { color: var(--text-main); }
+          .lich-o.hom-nay.dang-chon .cham { background-color: var(--text-sub); }
+
+          .lich-o.thang-khac { opacity: 0.3; pointer-events: none; }
+
+          .lich-so {
+              font-size: 14px;
+              color: var(--text-main);
+              line-height: 1;
+          }
+
+          .lich-cham {
+              display: flex;
+              gap: 2px;
+          }
+
+          .cham {
+              width: 5px;
+              height: 5px;
+              border-radius: 50%;
+              background-color: var(--text-sub);
+          }
+
+          .lich-o.hom-nay .cham { background-color: var(--bg-card); opacity: 0.7; }
+
+          .lich-panel {
+              margin-top: 16px;
+              border-top: 1px solid var(--border);
+              padding-top: 14px;
+          }
+
+          .lich-panel-tieu-de {
+              font-size: 13px;
+              font-weight: bold;
+              color: var(--text-sub);
+              text-transform: uppercase;
+              letter-spacing: 1px;
+              margin-bottom: 8px;
+          }
+
+          .lich-task-item {
+              display: flex;
+              align-items: center;
+              gap: 10px;
+              padding: 8px 12px;
+              background-color: var(--bg-item);
+              border: 1px solid var(--border);
+              border-radius: 8px;
+              margin-top: 6px;
+              cursor: pointer;
+          }
+
+          .lich-task-item:hover { opacity: 0.8; }
+
+          .lich-task-ten {
+              flex: 1;
+              font-size: 14px;
+              color: var(--text-main);
+          }
+
+          .lich-task-gio {
+              font-size: 12px;
+              color: var(--text-sub);
+          }
+
+          .lich-task-ds {
+              font-size: 11px;
+              padding: 2px 8px;
+              border-radius: 20px;
+              background-color: var(--border);
+              color: var(--text-sub);
+          }
+
+          .lich-task-item.da-xong .lich-task-ten {
+              text-decoration: line-through;
+              color: var(--text-muted);
+          }
+
+          .lich-trong {
+              text-align: center;
+              color: var(--text-sub);
+              font-size: 14px;
+              padding: 20px 0;
+          }
+      </style>
+  </head>
+  <body>
+
+      <div class="container">
+          <div class="header">
+              <h1>To-do List</h1>
+              <button class="btn-dark-mode" onclick="batTatDarkMode()" id="btn-dark">🌙</button>
+          </div>
+
+          <div class="tabs">
+              <div class="tab active" onclick="chuyenTab('danh-sach-tab', this)">Danh sách</div>
+              <div class="tab" onclick="chuyenTab('lich-tab', this)">Lịch</div>
+          </div>
+
+          <!-- Màn hình Danh sách -->
+          <div id="danh-sach-tab" class="man-hinh active">
+
+              <div class="input-block">
+                  <div class="input-row">
+                      <input
+                          type="text"
+                          id="input-cong-viec"
+                          placeholder="Nhập công việc..."
+                          onkeydown="nhimEnter(event)"
+                      >
+                      <button class="btn-them" onclick="themCongViec()">Thêm</button>
+                  </div>
+                  <div class="input-row">
+                      <input type="datetime-local" id="input-deadline">
+                      <select id="input-danh-sach">
+                          <option value="">— Danh sách —</option>
+                          <option value="Work">Work</option>
+                          <option value="Study">Study</option>
+                          <option value="Health">Health</option>
+                          <option value="Entertainment">Entertainment</option>
+                      </select>
+                  </div>
+              </div>
+
+              <div class="o-tim-kiem">
+                  <span class="icon-tim-kiem">⌕</span>
+                  <input
+                      type="text"
+                      id="input-tim-kiem"
+                      placeholder="Tìm kiếm task..."
+                      oninput="timKiem()"
+                  >
+              </div>
+
+              <div class="bo-loc">
+                  <button class="btn-loc active" onclick="locTheo('tat-ca', this)">Tất cả</button>
+                  <button class="btn-loc" onclick="locTheo('Work', this)">Work</button>
+                  <button class="btn-loc" onclick="locTheo('Study', this)">Study</button>
+                  <button class="btn-loc" onclick="locTheo('Health', this)">Health</button>
+                  <button class="btn-loc" onclick="locTheo('Entertainment', this)">Entertainment</button>
+              </div>
+
+              <p class="dem-cong-viec" id="dem">Chưa có công việc nào</p>
+              <div id="danh-sach"></div>
+
+          </div>
+
+          <!-- Màn hình Lịch -->
+          <div id="lich-tab" class="man-hinh">
+              <div class="lich-header">
+                  <button class="btn-thang" onclick="doiThang(-1)">‹</button>
+                  <span id="tieu-de-thang"></span>
+                  <button class="btn-thang" onclick="doiThang(1)">›</button>
+              </div>
+              <div class="lich-grid" id="lich-grid"></div>
+              <div class="lich-panel" id="lich-panel"></div>
+          </div>
+
+      </div>
+
+      <script>
+          let danhSachData = JSON.parse(localStorage.getItem("todos")) || [];
+          let locHienTai   = "tat-ca";
+          let tuKhoaTimKiem = "";
+
+          // ============================================
+          // DARK MODE
+          // ============================================
+          function batTatDarkMode() {
+              document.body.classList.toggle("dark");
+              let isDark = document.body.classList.contains("dark");
+              document.getElementById("btn-dark").textContent = isDark ? "☀️" : "🌙";
+              localStorage.setItem("darkMode", isDark ? "on" : "off");
+          }
+
+          if (localStorage.getItem("darkMode") === "on") {
+              document.body.classList.add("dark");
+              document.getElementById("btn-dark").textContent = "☀️";
+          }
+
+          // ============================================
+          // TABS
+          // ============================================
+          function chuyenTab(tabId, nut) {
+              document.querySelectorAll(".man-hinh").forEach(m => m.classList.remove("active"));
+              document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+              document.getElementById(tabId).classList.add("active");
+              nut.classList.add("active");
+              if (tabId === "lich-tab") veLich();
+          }
+
+          // ============================================
+          // LỌC + TÌM KIẾM
+          // ============================================
+          function locTheo(gia_tri, nut) {
+              locHienTai = gia_tri;
+              document.querySelectorAll(".btn-loc").forEach(b => b.classList.remove("active"));
+              nut.classList.add("active");
+              veGiaoDien();
+          }
+
+          function timKiem() {
+              tuKhoaTimKiem = document.getElementById("input-tim-kiem").value.trim().toLowerCase();
+              veGiaoDien();
+          }
+
+          function layDanhSachDaLoc() {
+              let ketQua = danhSachData;
+              if (locHienTai !== "tat-ca") {
+                  ketQua = ketQua.filter(task => task.danhSach === locHienTai);
+              }
+              if (tuKhoaTimKiem !== "") {
+                  ketQua = ketQua.filter(task =>
+                      task.tenCongViec.toLowerCase().includes(tuKhoaTimKiem)
+                  );
+              }
+              return ketQua;
+          }
+
+          function highlight(text) {
+              if (!tuKhoaTimKiem) return text;
+              let regex = new RegExp("(" + tuKhoaTimKiem.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ")", "gi");
+              return text.replace(regex, '<mark class="highlight">$1</mark>');
+          }
+
+          // ============================================
+          // VẼ GIAO DIỆN
+          // ============================================
+          function veGiaoDien() {
+              let container = document.getElementById("danh-sach");
+              container.innerHTML = "";
+
+              let daDuocLoc = layDanhSachDaLoc();
+              if (daDuocLoc.length === 0) { capNhatDem(); return; }
+
+              let coDeadline    = daDuocLoc.filter(t => t.deadline);
+              let khongDeadline = daDuocLoc.filter(t => !t.deadline);
+
+              let nhomTheoNgay = {};
+              coDeadline.forEach(function(task) {
+                  let ngay = task.deadline.split("T")[0];
+                  if (!nhomTheoNgay[ngay]) nhomTheoNgay[ngay] = [];
+                  nhomTheoNgay[ngay].push(task);
+              });
+
+              Object.keys(nhomTheoNgay).sort().forEach(function(ngay) {
+                  let nhom   = document.createElement("div");
+                  nhom.className = "nhom-ngay";
+
+                  let tieuDe = document.createElement("div");
+                  tieuDe.className = "tieu-de-ngay";
+
+                  let homNay = layNgayHomNay();
+                  if (ngay < homNay) {
+                      tieuDe.classList.add("qua-han");
+                      tieuDe.textContent = "Quá hạn — " + dinhDangNgay(ngay);
+                  } else if (ngay === homNay) {
+                      tieuDe.classList.add("hom-nay");
+                      tieuDe.textContent = "Hôm nay — " + dinhDangNgay(ngay);
+                  } else {
+                      tieuDe.textContent = dinhDangNgay(ngay);
+                  }
+
+                  nhom.appendChild(tieuDe);
+                  let ul = document.createElement("ul");
+                  nhomTheoNgay[ngay].forEach(function(task) {
+                      ul.appendChild(taoLiElement(task, danhSachData.indexOf(task)));
+                  });
+                  nhom.appendChild(ul);
+                  container.appendChild(nhom);
+              });
+
+              if (khongDeadline.length > 0) {
+                  let nhom   = document.createElement("div");
+                  nhom.className = "nhom-ngay";
+                  let tieuDe = document.createElement("div");
+                  tieuDe.className = "tieu-de-ngay";
+                  tieuDe.textContent = "Chưa đặt deadline";
+                  nhom.appendChild(tieuDe);
+                  let ul = document.createElement("ul");
+                  khongDeadline.forEach(function(task) {
+                      ul.appendChild(taoLiElement(task, danhSachData.indexOf(task)));
+                  });
+                  nhom.appendChild(ul);
+                  container.appendChild(nhom);
+              }
+
+              capNhatDem();
+          }
+
+          // ============================================
+          // TẠO 1 DÒNG TASK
+          // ============================================
+          function taoLiElement(item, index) {
+              let li     = document.createElement("li");
+              let homNay = layNgayHomNay();
+
+              if (item.deadline && item.deadline.split("T")[0] < homNay && !item.hoànThành) {
+                  li.classList.add("qua-han");
+              }
+
+              let noiDung = document.createElement("div");
+              noiDung.className = "noi-dung-task";
+              if (item.hoànThành) noiDung.classList.add("hoan-thanh");
+
+              let tenSpan = document.createElement("span");
+              tenSpan.className = "ten-cong-viec";
+              tenSpan.innerHTML = highlight(item.tenCongViec);
+              noiDung.appendChild(tenSpan);
+
+              if (item.deadline) {
+                  let gioSpan = document.createElement("span");
+                  gioSpan.className = "gio-deadline";
+                  if (item.deadline.split("T")[0] < homNay && !item.hoànThành) {
+                      gioSpan.classList.add("qua-han");
+                  }
+                  gioSpan.textContent = dinhDangGio(item.deadline);
+                  noiDung.appendChild(gioSpan);
+              }
+
+              if (item.danhSach) {
+                  let badge = document.createElement("span");
+                  badge.className = "badge-ds";
+                  badge.textContent = item.danhSach;
+                  noiDung.appendChild(badge);
+              }
+
+              noiDung.onclick = function() {
+                  danhSachData[index].hoànThành = !danhSachData[index].hoànThành;
+                  luuDuLieu();
+                  veGiaoDien();
+              };
+
+              let nhomNut = document.createElement("div");
+              nhomNut.className = "nhom-nut";
+
+              let nutSua = document.createElement("button");
+              nutSua.textContent = "✎";
+              nutSua.title = "Sửa";
+              nutSua.onclick = function() { batDauSua(li, index, noiDung); };
+
+              let nutXoa = document.createElement("button");
+              nutXoa.textContent = "✕";
+              nutXoa.title = "Xóa";
+              nutXoa.onclick = function() {
+                  if (!confirm("Xóa task \"" + item.tenCongViec + "\"?")) return;
+                  danhSachData.splice(index, 1);
+                  luuDuLieu();
+                  veGiaoDien();
+              };
+
+              nhomNut.appendChild(nutSua);
+              nhomNut.appendChild(nutXoa);
+              li.appendChild(noiDung);
+              li.appendChild(nhomNut);
+
+              ganSuKienKeoTha(li, index);
+              return li;
+          }
+
+          // ============================================
+          // SỬA TASK
+          // ============================================
+          function batDauSua(li, index, noiDung) {
+              noiDung.style.display = "none";
+
+              let khoi = document.createElement("div");
+              khoi.style.flex = "1";
+              khoi.style.display = "flex";
+              khoi.style.flexDirection = "column";
+              khoi.style.gap = "6px";
+
+              let inputSua = document.createElement("input");
+              inputSua.type = "text";
+              inputSua.className = "input-sua";
+              inputSua.value = danhSachData[index].tenCongViec;
+
+              let inputDeadlineSua = document.createElement("input");
+              inputDeadlineSua.type = "datetime-local";
+              inputDeadlineSua.className = "input-sua";
+              inputDeadlineSua.value = danhSachData[index].deadline || "";
+
+              let selectSua = document.createElement("select");
+              selectSua.className = "input-sua";
+              selectSua.innerHTML = `
+                  <option value="">— Danh sách —</option>
+                  <option value="Work">Work</option>
+                  <option value="Study">Study</option>
+                  <option value="Health">Health</option>
+                  <option value="Entertainment">Entertainment</option>
+              `;
+              selectSua.value = danhSachData[index].danhSach || "";
+
+              khoi.appendChild(inputSua);
+              khoi.appendChild(inputDeadlineSua);
+              khoi.appendChild(selectSua);
+
+              let nutLuu = document.createElement("button");
+              nutLuu.textContent = "✓";
+              nutLuu.title = "Lưu";
+
+              function luuSua() {
+                  let noiDungMoi = inputSua.value.trim();
+                  if (noiDungMoi === "") {
+                      alert("Tên công việc không được để trống!");
+                      return;
+                  }
+                  danhSachData[index].tenCongViec = noiDungMoi;
+                  danhSachData[index].deadline    = inputDeadlineSua.value || null;
+                  danhSachData[index].danhSach    = selectSua.value || null;
+                  luuDuLieu();
+                  veGiaoDien();
+              }
+
+              nutLuu.onclick = luuSua;
+              inputSua.onkeydown = function(e) {
+                  if (e.key === "Enter")  luuSua();
+                  if (e.key === "Escape") veGiaoDien();
+              };
+
+              li.insertBefore(khoi, li.lastChild);
+              let nhomNut = li.lastChild;
+              nhomNut.insertBefore(nutLuu, nhomNut.firstChild);
+              nhomNut.children[1].style.display = "none";
+
+              inputSua.focus();
+              inputSua.setSelectionRange(inputSua.value.length, inputSua.value.length);
+          }
+
+          // ============================================
+          // KÉO THẢ
+          // ============================================
+          let indexDangKeo = null;
+
+          function ganSuKienKeoTha(li, index) {
+              li.draggable = true;
+
+              li.ondragstart = function() {
+                  indexDangKeo = index;
+                  setTimeout(() => li.classList.add("dang-keo"), 0);
+              };
+
+              li.ondragover = function(e) {
+                  e.preventDefault();
+                  document.querySelectorAll("li").forEach(el => el.classList.remove("vi-tri-tha"));
+                  li.classList.add("vi-tri-tha");
+              };
+
+              li.ondrop = function(e) {
+                  e.preventDefault();
+                  if (indexDangKeo === null || indexDangKeo === index) return;
+                  let taskKeo = danhSachData.splice(indexDangKeo, 1)[0];
+                  danhSachData.splice(index, 0, taskKeo);
+                  luuDuLieu();
+                  veGiaoDien();
+              };
+
+              li.ondragend = function() {
+                  indexDangKeo = null;
+                  document.querySelectorAll("li").forEach(el => {
+                      el.classList.remove("dang-keo");
+                      el.classList.remove("vi-tri-tha");
+                  });
+              };
+          }
+
+          // ============================================
+          // LỊCH
+          // ============================================
+          let thangHienTai = new Date().getMonth();
+          let namHienTai   = new Date().getFullYear();
+          let ngayDangChon = null;
+
+          function doiThang(delta) {
+              thangHienTai += delta;
+              if (thangHienTai > 11) { thangHienTai = 0; namHienTai++; }
+              if (thangHienTai < 0)  { thangHienTai = 11; namHienTai--; }
+              veLich();
+          }
+
+          function veLich() {
+              let grid   = document.getElementById("lich-grid");
+              let tieuDe = document.getElementById("tieu-de-thang");
+              grid.innerHTML = "";
+
+              let tenThang = ["Tháng 1","Tháng 2","Tháng 3","Tháng 4","Tháng 5","Tháng 6",
+                              "Tháng 7","Tháng 8","Tháng 9","Tháng 10","Tháng 11","Tháng 12"];
+              tieuDe.textContent = tenThang[thangHienTai] + " " + namHienTai;
+
+              ["CN","T2","T3","T4","T5","T6","T7"].forEach(function(thu) {
+                  let o = document.createElement("div");
+                  o.className = "lich-thu";
+                  o.textContent = thu;
+                  grid.appendChild(o);
+              });
+
+              let ngayDauThang       = new Date(namHienTai, thangHienTai, 1).getDay();
+              let soNgayTrongThang   = new Date(namHienTai, thangHienTai + 1, 0).getDate();
+              let soNgayThangTruoc   = new Date(namHienTai, thangHienTai, 0).getDate();
+              let homNayStr          = layNgayHomNay();
+
+              let taskTheoNgay = {};
+              danhSachData.forEach(function(task) {
+                  if (!task.deadline) return;
+                  let ngay = task.deadline.split("T")[0];
+                  if (!taskTheoNgay[ngay]) taskTheoNgay[ngay] = [];
+                  taskTheoNgay[ngay].push(task);
+              });
+
+              // Ô tháng trước
+              for (let i = 0; i < ngayDauThang; i++) {
+                  let so = soNgayThangTruoc - ngayDauThang + 1 + i;
+                  let o  = document.createElement("div");
+                  o.className = "lich-o thang-khac";
+                  o.innerHTML = `<span class="lich-so">${so}</span>`;
+                  grid.appendChild(o);
+              }
+
+              // Ô ngày trong tháng
+              for (let ngay = 1; ngay <= soNgayTrongThang; ngay++) {
+                  let thangStr = String(thangHienTai + 1).padStart(2, "0");
+                  let ngayStr  = String(ngay).padStart(2, "0");
+                  let ngayDay  = namHienTai + "-" + thangStr + "-" + ngayStr;
+
+                  let o = document.createElement("div");
+                  o.className = "lich-o";
+                  if (ngayDay === homNayStr)    o.classList.add("hom-nay");
+                  if (ngayDay === ngayDangChon) o.classList.add("dang-chon");
+
+                  let soEl = document.createElement("span");
+                  soEl.className = "lich-so";
+                  soEl.textContent = ngay;
+                  o.appendChild(soEl);
+
+                  if (taskTheoNgay[ngayDay]) {
+                      let chamRow = document.createElement("div");
+                      chamRow.className = "lich-cham";
+                      let soTask = Math.min(taskTheoNgay[ngayDay].length, 3);
+                      for (let c = 0; c < soTask; c++) {
+                          let cham = document.createElement("div");
+                          cham.className = "cham";
+                          chamRow.appendChild(cham);
+                      }
+                      o.appendChild(chamRow);
+                  }
+
+                  o.onclick = function() {
+                      ngayDangChon = ngayDay;
+                      veLich();
+                      hienTaskCuaNgay(ngayDay);
+                  };
+
+                  grid.appendChild(o);
+              }
+
+              // Ô tháng sau
+              let tongO   = ngayDauThang + soNgayTrongThang;
+              let oConLai = tongO % 7 === 0 ? 0 : 7 - (tongO % 7);
+              for (let i = 1; i <= oConLai; i++) {
+                  let o = document.createElement("div");
+                  o.className = "lich-o thang-khac";
+                  o.innerHTML = `<span class="lich-so">${i}</span>`;
+                  grid.appendChild(o);
+              }
+
+              if (ngayDangChon) hienTaskCuaNgay(ngayDangChon);
+          }
+
+          function hienTaskCuaNgay(ngayDay) {
+              let panel = document.getElementById("lich-panel");
+              panel.innerHTML = "";
+
+              let [nam, thang, ngay] = ngayDay.split("-");
+              let tieuDe = document.createElement("div");
+              tieuDe.className = "lich-panel-tieu-de";
+              tieuDe.textContent = "Ngày " + ngay + "/" + thang;
+              panel.appendChild(tieuDe);
+
+              let taskHom = danhSachData.filter(function(task) {
+                  return task.deadline && task.deadline.split("T")[0] === ngayDay;
+              });
+
+              if (taskHom.length === 0) {
+                  let trong = document.createElement("div");
+                  trong.className = "lich-trong";
+                  trong.textContent = "Không có task nào";
+                  panel.appendChild(trong);
+                  return;
+              }
+
+              taskHom.sort((a, b) => a.deadline.localeCompare(b.deadline));
+
+              taskHom.forEach(function(task) {
+                  let item = document.createElement("div");
+                  item.className = "lich-task-item";
+                  if (task.hoànThành) item.classList.add("da-xong");
+
+                  let gio = document.createElement("span");
+                  gio.className = "lich-task-gio";
+                  gio.textContent = dinhDangGio(task.deadline);
+
+                  let ten = document.createElement("span");
+                  ten.className = "lich-task-ten";
+                  ten.textContent = task.tenCongViec;
+
+                  item.appendChild(gio);
+                  item.appendChild(ten);
+
+                  if (task.danhSach) {
+                      let ds = document.createElement("span");
+                      ds.className = "lich-task-ds";
+                      ds.textContent = task.danhSach;
+                      item.appendChild(ds);
+                  }
+
+                  item.onclick = function() {
+                      let index = danhSachData.indexOf(task);
+                      danhSachData[index].hoànThành = !danhSachData[index].hoànThành;
+                      luuDuLieu();
+                      veLich();
+                  };
+
+                  panel.appendChild(item);
+              });
+          }
+
+          // ============================================
+          // NHẮC DEADLINE TRƯỚC 15 PHÚT
+          // ============================================
+          if ("Notification" in window && Notification.permission === "default") {
+              Notification.requestPermission();
+          }
+
+          let daNhac = JSON.parse(localStorage.getItem("daNhac")) || {};
+
+          function kiemTraDeadline() {
+              if (Notification.permission !== "granted") return;
+              let bayGio = new Date();
+              danhSachData.forEach(function(task) {
+                  if (!task.deadline || task.hoànThành) return;
+                  let thoiGianDeadline = new Date(task.deadline);
+                  let conLai = (thoiGianDeadline - bayGio) / 1000 / 60;
+                  let key = task.deadline + task.tenCongViec;
+                  if (conLai > 0 && conLai <= 15 && !daNhac[key]) {
+                      new Notification("⏰ Sắp đến hạn!", {
+                          body: "\"" + task.tenCongViec + "\" còn 15 phút nữa!"
+                      });
+                      daNhac[key] = true;
+                      localStorage.setItem("daNhac", JSON.stringify(daNhac));
+                  }
+              });
+          }
+
+          setInterval(kiemTraDeadline, 60 * 1000);
+          kiemTraDeadline();
+
+          // ============================================
+          // HÀM TIỆN ÍCH
+          // ============================================
+          function layNgayHomNay() {
+              return new Date().toISOString().split("T")[0];
+          }
+
+          function dinhDangNgay(chuoiNgay) {
+              let [nam, thang, ngay] = chuoiNgay.split("-");
+              return ngay + "/" + thang;
+          }
+
+          function dinhDangGio(chuoiDatetime) {
+              let [ngay, gio] = chuoiDatetime.split("T");
+              let [h, m] = gio.split(":");
+              return h + ":" + m;
+          }
+
+          function luuDuLieu() {
+              localStorage.setItem("todos", JSON.stringify(danhSachData));
+          }
+
+          function nhimEnter(event) {
+              if (event.key === "Enter") themCongViec();
+          }
+
+          function themCongViec() {
+              let input        = document.getElementById("input-cong-viec");
+              let inputDeadline = document.getElementById("input-deadline");
+              let inputDanhSach = document.getElementById("input-danh-sach");
+              let congViec     = input.value.trim();
+
+              if (congViec === "") {
+                  alert("Bạn chưa nhập công việc!");
+                  return;
+              }
+
+              danhSachData.push({
+                  tenCongViec: congViec,
+                  hoànThành:  false,
+                  deadline:   inputDeadline.value || null,
+                  danhSach:   inputDanhSach.value || null
+              });
+
+              luuDuLieu();
+              veGiaoDien();
+
+              input.value = "";
+              inputDeadline.value = "";
+              inputDanhSach.value = "";
+              input.focus();
+          }
+
+          function capNhatDem() {
+              let daDuocLoc  = layDanhSachDaLoc();
+              let tatCa      = daDuocLoc.length;
+              let hoànThành  = daDuocLoc.filter(item => item.hoànThành).length;
+              let chuaXong   = tatCa - hoànThành;
+              let dem        = document.getElementById("dem");
+
+              if (tatCa === 0) {
+                  dem.textContent = locHienTai === "tat-ca"
+                      ? "Chưa có công việc nào"
+                      : "Không có task nào trong mục này";
+              } else if (chuaXong === 0) {
+                  dem.textContent = "Bạn đã hoàn thành tất cả!";
+              } else {
+                  dem.textContent = "Còn " + chuaXong + " việc chưa xong";
+              }
+          }
+
+          veGiaoDien();
+      </script>
+
+  </body>
+  </html>
