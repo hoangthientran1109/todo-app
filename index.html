@@ -35,29 +35,23 @@
           onValue(ref(db, "todos"), (snap) => {
               let data = snap.val();
               if (data && Array.isArray(data.tasks)) {
-                  // Chỉ update nếu data từ cloud khác với local (tránh loop)
-                  let cloudJSON = JSON.stringify(data.tasks);
-                  let localJSON = JSON.stringify(window.danhSachData || []);
-                  if (cloudJSON !== localJSON) {
-                      window.danhSachData = data.tasks;
-                      localStorage.setItem("todos", cloudJSON);
-                      if (typeof window.veGiaoDien === "function") window.veGiaoDien();
-                  }
+                  window.danhSachData = data.tasks;
+                  localStorage.setItem("todos", JSON.stringify(data.tasks));
               }
+              // Luôn re-render sau khi Firebase trả về
+              if (typeof window.veGiaoDien === "function") window.veGiaoDien();
           });
 
           onValue(ref(db, "categories"), (snap) => {
               let data = snap.val();
               if (data && Array.isArray(data.list) && data.list.length > 0) {
-                  let cloudJSON = JSON.stringify(data.list);
-                  let localJSON = JSON.stringify(window.danhMucList || []);
-                  if (cloudJSON !== localJSON) {
-                      window.danhMucList = data.list;
-                      localStorage.setItem("categories", cloudJSON);
-                      if (typeof window.veThanhLoc === "function") window.veThanhLoc();
-                      if (typeof window.capNhatSelectDanhMuc === "function") window.capNhatSelectDanhMuc();
-                  }
+                  window.danhMucList = data.list;
+                  localStorage.setItem("categories", JSON.stringify(data.list));
               }
+              // Luôn re-render thanh lọc + select sau khi Firebase trả về
+              // (dù data giống hay khác — đảm bảo UI đúng trên mọi thiết bị)
+              if (typeof window.veThanhLoc === "function") window.veThanhLoc();
+              if (typeof window.capNhatSelectDanhMuc === "function") window.capNhatSelectDanhMuc();
           });
 
           // Expose hàm push lên Firebase
