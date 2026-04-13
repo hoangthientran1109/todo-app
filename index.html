@@ -5,6 +5,89 @@
   rel="stylesheet">
       <title>To-do List</title>
 
+      <!-- Firebase SDK -->
+      <script type="module">
+          import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+          import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+          // =====================================================
+          // ĐỔI config này thành config Firebase project của mày
+          // =====================================================
+          const firebaseConfig = {
+  apiKey: "AIzaSyBRhwGwOl1W5O_y8OCvKtnLZsp2oleOKqI",
+  authDomain: "my-todo-app-ecf5e.firebaseapp.com",
+  databaseURL: "https://my-todo-app-ecf5e-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "my-todo-app-ecf5e",
+  storageBucket: "my-todo-app-ecf5e.firebasestorage.app",
+  messagingSenderId: "198555152410",
+  appId: "1:198555152410:web:2b8c09548e10d8a4b661a3"
+};
+
+          const app = initializeApp(firebaseConfig);
+          const db  = getDatabase(app);
+
+          // Expose để code non-module dùng
+          window._fbRef = ref;
+          window._fbSet = set;
+          window._fbDB  = db;
+
+          // Lắng nghe thay đổi từ cloud → cập nhật local + UI
+          onValue(ref(db, "todos"), (snap) => {
+              let data = snap.val();
+              if (data && Array.isArray(data.tasks)) {
+                  // Chỉ update nếu data từ cloud khác với local (tránh loop)
+                  let cloudJSON = JSON.stringify(data.tasks);
+                  let localJSON = JSON.stringify(window.danhSachData || []);
+                  if (cloudJSON !== localJSON) {
+                      window.danhSachData = data.tasks;
+                      localStorage.setItem("todos", cloudJSON);
+                      if (typeof window.veGiaoDien === "function") window.veGiaoDien();
+                  }
+              }
+          });
+
+          onValue(ref(db, "categories"), (snap) => {
+              let data = snap.val();
+              if (data && Array.isArray(data.list) && data.list.length > 0) {
+                  let cloudJSON = JSON.stringify(data.list);
+                  let localJSON = JSON.stringify(window.danhMucList || []);
+                  if (cloudJSON !== localJSON) {
+                      window.danhMucList = data.list;
+                      localStorage.setItem("categories", cloudJSON);
+                      if (typeof window.veThanhLoc === "function") window.veThanhLoc();
+                      if (typeof window.capNhatSelectDanhMuc === "function") window.capNhatSelectDanhMuc();
+                  }
+              }
+          });
+
+          // Expose hàm push lên Firebase
+          window.syncToCloud = function() {
+              try {
+                  set(ref(db, "todos"),      { tasks: window.danhSachData });
+                  set(ref(db, "categories"), { list:  window.danhMucList  });
+                  let el = document.getElementById("sync-status");
+                  if (el) { el.textContent = "☁ synced"; el.style.color = "var(--text-muted)"; }
+              } catch(e) {
+                  console.warn("Firebase sync failed:", e);
+                  let el = document.getElementById("sync-status");
+                  if (el) { el.textContent = "⚠ offline"; el.style.color = "#e74c3c"; }
+              }
+          };
+
+          // Hiển thị trạng thái kết nối Firebase
+          onValue(ref(db, ".info/connected"), (snap) => {
+              let el = document.getElementById("sync-status");
+              if (!el) return;
+              if (snap.val() === true) {
+                  el.textContent = "☁ online";
+                  el.style.color = "var(--text-muted)";
+              } else {
+                  el.textContent = "⚠ offline";
+                  el.style.color = "#e74c3c";
+              }
+          });
+      </script>
+
       <style>
           * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -136,13 +219,15 @@
               padding: 10px;
               border: 2px solid var(--border-input);
               border-radius: 8px;
-              font-size: 15px;
+              font-size: 16px;
               color: var(--text-main);
               background-color: var(--bg-card);
               transition: border-color 0.2s, background-color 0.3s, color 0.3s;
               width: 100%;
               color-scheme: light;
               font-family: 'Lora', Georgia, serif;
+              -webkit-appearance: auto;
+              appearance: auto;
           }
 
           body.dark input[type="datetime-local"] { color-scheme: dark; }
@@ -706,31 +791,6 @@
               .lich-so { font-size: 12px; }
               .cham { width: 4px; height: 4px; }
           }
-/* Xuất / Nhập */
-          .xuat-nhap-wrap {
-              display: flex;
-              gap: 6px;
-              margin-top: 8px;
-          }
-
-          .btn-xuat-nhap {
-              flex: 1;
-              padding: 7px 12px;
-              border: 1px solid var(--border-input);
-              border-radius: 8px;
-              background: transparent;
-              font-size: 13px;
-              cursor: pointer;
-              color: var(--text-sub);
-              transition: all 0.15s;
-              font-family: 'Lora', Georgia, serif;
-              text-align: center;
-          }
-
-          .btn-xuat-nhap:hover {
-              border-color: var(--btn-primary);
-              color: var(--btn-primary);
-          }
           /* Nút quản lý danh mục */
           .btn-quan-ly-dm {
               background: none;
@@ -875,6 +935,7 @@
       <div class="container">
           <div class="header">
               <h1>To-do List</h1>
+              <span id="sync-status" title="Trạng thái đồng bộ" style="position:absolute;left:0;font-size:11px;color:var(--text-muted);letter-spacing:0;">⏳ sync...</span>
               <button class="btn-dark-mode" onclick="batTatDarkMode()" id="btn-dark">🌙</button>
           </div>
 
@@ -947,13 +1008,6 @@
 
               <div id="danh-sach"></div>
 
-              <div class="xuat-nhap-wrap">
-                  <button class="btn-xuat-nhap" onclick="xuatJSON()">⬇ Xuất JSON</button>
-                  <label class="btn-xuat-nhap" style="cursor:pointer;">
-                      ⬆ Nhập JSON
-                      <input type="file" accept=".json" onchange="nhapJSON(event)" style="display:none">
-                  </label>
-              </div>
 
           </div>
           <!-- Màn hình Lịch -->
@@ -984,15 +1038,30 @@
       </div>
 
       <script>
-          let danhSachData  = JSON.parse(localStorage.getItem("todos")) || [];
+          const DEFAULT_CATEGORIES = ["Work", "Study", "Health", "Relax"];
+
+          // Khởi tạo data — localStorage là cache, Firebase sẽ override khi connect
+          let danhSachData = JSON.parse(localStorage.getItem("todos")) || [];
           let locHienTai    = "tat-ca";
           let tuKhoaTimKiem = "";
 
-          const DEFAULT_CATEGORIES = ["Work", "Study", "Health", "Relax"];
-          let danhMucList = JSON.parse(localStorage.getItem("categories")) || [...DEFAULT_CATEGORIES];
+          // Đảm bảo DEFAULT_CATEGORIES luôn có trong danhMucList
+          let _savedCats = JSON.parse(localStorage.getItem("categories"));
+          let danhMucList = (_savedCats && _savedCats.length > 0) ? _savedCats : [...DEFAULT_CATEGORIES];
+          // Merge: thêm category mặc định nếu user chưa có
+          DEFAULT_CATEGORIES.forEach(function(cat) {
+              if (!danhMucList.includes(cat)) danhMucList.unshift(cat);
+          });
+
+          // Expose lên window để Firebase module script truy cập được
+          window.danhSachData = danhSachData;
+          window.danhMucList  = danhMucList;
+
 
           function luuDanhMuc() {
               localStorage.setItem("categories", JSON.stringify(danhMucList));
+              window.danhMucList = danhMucList;
+              if (typeof window.syncToCloud === "function") window.syncToCloud();
           }
 
           // ============================================
@@ -1812,6 +1881,36 @@
           kiemTraDeadline();
 
           // ============================================
+          // KHỞI TẠO UI + EXPOSE LÊN WINDOW CHO FIREBASE
+          // ============================================
+          function _init() {
+              // Wrap veGiaoDien để auto-sync window vars trước khi vẽ
+              let _origVGD = veGiaoDien;
+              veGiaoDien = function() {
+                  if (window.danhSachData !== danhSachData) danhSachData = window.danhSachData;
+                  if (window.danhMucList  !== danhMucList)  danhMucList  = window.danhMucList;
+                  _origVGD();
+              };
+
+              let _origVTL = veThanhLoc;
+              veThanhLoc = function() {
+                  if (window.danhMucList !== danhMucList) danhMucList = window.danhMucList;
+                  _origVTL();
+              };
+
+              // Expose lên window để Firebase module script gọi được
+              window.veGiaoDien           = veGiaoDien;
+              window.veThanhLoc           = veThanhLoc;
+              window.capNhatSelectDanhMuc = capNhatSelectDanhMuc;
+
+              // Khởi tạo UI lần đầu
+              veGiaoDien();
+              veThanhLoc();
+              capNhatSelectDanhMuc();
+          }
+          _init();
+
+          // ============================================
           // HÀM TIỆN ÍCH
           // ============================================
           function layNgayHomNay() {
@@ -1831,6 +1930,8 @@
 
           function luuDuLieu() {
               localStorage.setItem("todos", JSON.stringify(danhSachData));
+              window.danhSachData = danhSachData;
+              if (typeof window.syncToCloud === "function") window.syncToCloud();
           }
 
           function nhimEnter(event) {
@@ -1866,53 +1967,6 @@
               input.focus();
           }
 
-          veGiaoDien();
-          veThanhLoc();
-          capNhatSelectDanhMuc();
-// ============================================
-          // XUẤT / NHẬP JSON
-          // ============================================
-          function xuatJSON() {
-              if (danhSachData.length === 0) {
-                  alert("Không có task nào để xuất!");
-                  return;
-              }
-              let duLieu  = JSON.stringify(danhSachData, null, 2);
-              let blob    = new Blob([duLieu], { type: "application/json" });
-              let url     = URL.createObjectURL(blob);
-              let a       = document.createElement("a");
-              let ngayHom = new Date().toISOString().split("T")[0];
-              a.href      = url;
-              a.download  = "todo-backup-" + ngayHom + ".json";
-              a.click();
-              URL.revokeObjectURL(url);
-          }
-
-          function nhapJSON(event) {
-              let file   = event.target.files[0];
-              if (!file) return;
-
-              let reader = new FileReader();
-              reader.onload = function(e) {
-                  try {
-                      let duLieu = JSON.parse(e.target.result);
-                      if (!Array.isArray(duLieu)) {
-                          alert("File không đúng định dạng!");
-                          return;
-                      }
-                      hienModal("Nhập " + duLieu.length + " task? Dữ liệu hiện tại sẽ bị ghi đè!", "Nhập", function() {
-                          danhSachData = duLieu;
-                          luuDuLieu();
-                          veGiaoDien();
-                          alert("Nhập thành công " + duLieu.length + " task!");
-                      });
-                  } catch(err) {
-                      alert("File lỗi, không đọc được!");
-                  }
-              };
-              reader.readAsText(file);
-              event.target.value = ""; // reset để có thể nhập lại cùng file
-          }
       </script>
 
   </body>
