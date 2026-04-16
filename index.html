@@ -299,9 +299,15 @@
           .bo-loc {
               display: flex;
               gap: 6px;
-              flex-wrap: wrap;
+              flex-wrap: nowrap;
+              overflow-x: auto;
               margin: 6px 0 4px;
+              padding-bottom: 2px;
+              -webkit-overflow-scrolling: touch;
+              scrollbar-width: none;
           }
+
+          .bo-loc::-webkit-scrollbar { display: none; }
 
           .btn-loc {
               padding: 4px 12px;
@@ -739,6 +745,25 @@
               color: var(--text-sub);
           }
 
+          .lich-task-xoa {
+              background: none;
+              border: 1px solid var(--border-input);
+              border-radius: 6px;
+              font-size: 13px;
+              padding: 2px 7px;
+              cursor: pointer;
+              color: var(--text-muted);
+              flex-shrink: 0;
+              transition: all 0.15s;
+              line-height: 1.4;
+          }
+
+          .lich-task-xoa:hover {
+              background-color: #e74c3c;
+              border-color: #e74c3c;
+              color: white;
+          }
+
           .lich-task-item.da-xong .lich-task-ten {
               text-decoration: line-through;
               color: var(--text-muted);
@@ -750,6 +775,127 @@
               font-size: 14px;
               font-style: italic;
               padding: 20px 0;
+          }
+
+          /* Nút lưu trữ dưới danh sách */
+          .luu-tru-footer {
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              margin-top: 16px;
+              padding-top: 12px;
+              border-top: 1px solid var(--border);
+          }
+
+          .luu-tru-footer-gio {
+              font-size: 12px;
+              color: var(--text-muted);
+              font-style: italic;
+          }
+
+          .btn-luu-tru {
+              padding: 5px 14px;
+              border: 1px solid var(--border-input);
+              border-radius: 8px;
+              background: transparent;
+              font-size: 13px;
+              cursor: pointer;
+              color: var(--text-sub);
+              transition: all 0.15s;
+              font-family: 'Lora', Georgia, serif;
+          }
+
+          .btn-luu-tru:hover {
+              background-color: var(--btn-primary);
+              color: var(--bg-card);
+              border-color: var(--btn-primary);
+          }
+
+          /* Lưu trữ */
+          .luu-tru-wrap {
+              margin-top: 20px;
+              border-top: 1px solid var(--border);
+              padding-top: 12px;
+          }
+
+          .luu-tru-header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              cursor: pointer;
+              padding: 6px 0;
+              font-size: 14px;
+              font-weight: 600;
+              color: var(--text-sub);
+              user-select: none;
+          }
+
+          .luu-tru-header:hover { color: var(--text-main); }
+
+          .luu-tru-nhom {
+              margin-top: 10px;
+          }
+
+          .luu-tru-ngay {
+              font-size: 11px;
+              font-weight: 600;
+              color: var(--text-muted);
+              text-transform: uppercase;
+              letter-spacing: 1px;
+              margin: 10px 0 4px;
+          }
+
+          .luu-tru-item {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              padding: 8px 12px;
+              background-color: var(--bg-item);
+              border: 1px solid var(--border);
+              border-radius: 8px;
+              margin-top: 4px;
+              opacity: 0.75;
+          }
+
+          .luu-tru-ten {
+              flex: 1;
+              font-size: 14px;
+              color: var(--text-sub);
+              text-decoration: line-through;
+          }
+
+          .luu-tru-ds {
+              font-size: 11px;
+              padding: 2px 7px;
+              border-radius: 20px;
+              background-color: var(--border);
+              color: var(--text-muted);
+          }
+
+          .btn-khoi-phuc {
+              background: none;
+              border: 1px solid var(--border-input);
+              border-radius: 6px;
+              font-size: 12px;
+              padding: 2px 8px;
+              cursor: pointer;
+              color: var(--text-sub);
+              white-space: nowrap;
+              font-family: 'Lora', Georgia, serif;
+              transition: all 0.15s;
+          }
+
+          .btn-khoi-phuc:hover {
+              background-color: var(--btn-primary);
+              color: var(--bg-card);
+              border-color: var(--btn-primary);
+          }
+
+          .luu-tru-trong {
+              font-size: 13px;
+              color: var(--text-muted);
+              font-style: italic;
+              padding: 10px 0;
           }
 
           /* Mobile */
@@ -922,6 +1068,20 @@
               justify-content: flex-end;
           }
 
+          .btn-modal-ok {
+              padding: 6px 18px;
+              background-color: var(--btn-primary);
+              color: var(--bg-card);
+              border: none;
+              border-radius: 8px;
+              font-size: 14px;
+              cursor: pointer;
+              font-family: 'Lora', Georgia, serif;
+              transition: background-color 0.2s;
+          }
+
+          .btn-modal-ok:hover { background-color: var(--btn-hover); }
+
       </style>
   </head>
   <body>
@@ -1002,6 +1162,11 @@
 
               <div id="danh-sach"></div>
 
+              <div class="luu-tru-footer" id="luu-tru-footer">
+                  <span id="luu-tru-footer-gio" class="luu-tru-footer-gio"></span>
+                  <button class="btn-luu-tru" onclick="luuTruTatCa()">Lưu trữ</button>
+              </div>
+
 
           </div>
           <!-- Màn hình Lịch -->
@@ -1026,7 +1191,7 @@
               <div class="modal-msg" id="modal-msg"></div>
               <div class="modal-nut">
                   <button class="btn-toolbar" id="modal-huy">Huỷ</button>
-                  <button class="btn-toolbar nguy-hiem" id="modal-ok">Xóa</button>
+                  <button class="btn-modal-ok" id="modal-ok">Xóa</button>
               </div>
           </div>
       </div>
@@ -1178,12 +1343,13 @@
           // ============================================
           // MODAL XÁC NHẬN
           // ============================================
-          function hienModal(message, labelOk, callback) {
+          function hienModal(message, labelOk, callback, chiDong) {
               let overlay = document.getElementById("modal-xac-nhan");
-              document.getElementById("modal-msg").textContent = message;
+              document.getElementById("modal-msg").innerHTML = message.replace(/\n/g, "<br>");
               let btnOk  = document.getElementById("modal-ok");
               let btnHuy = document.getElementById("modal-huy");
               btnOk.textContent = labelOk || "Xóa";
+              btnHuy.style.display = chiDong ? "none" : "";
               overlay.style.display = "flex";
 
               function dongModal() {
@@ -1191,9 +1357,10 @@
                   btnOk.onclick   = null;
                   btnHuy.onclick  = null;
                   overlay.onclick = null;
+                  btnHuy.style.display = "";
               }
 
-              btnOk.onclick  = function() { dongModal(); callback(); };
+              btnOk.onclick  = function() { dongModal(); if (callback) callback(); };
               btnHuy.onclick = dongModal;
               overlay.onclick = function(e) { if (e.target === overlay) dongModal(); };
           }
@@ -1221,7 +1388,14 @@
               document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
               document.getElementById(tabId).classList.add("active");
               nut.classList.add("active");
-              if (tabId === "lich-tab")     veLich();
+              if (tabId === "lich-tab") {
+                  veLich();
+                  // Cập nhật số lượng lưu trữ trên tiêu đề
+                  let soLT = danhSachData.filter(t => t.luuTru).length;
+                  let el = document.getElementById("luu-tru-title");
+                  if (el) el.textContent = "📦 Lưu trữ" + (soLT > 0 ? " (" + soLT + ")" : "");
+                  if (luuTruMoDang) veLuuTru();
+              }
           }
 
           // ============================================
@@ -1240,7 +1414,7 @@
           }
 
           function layDanhSachDaLoc() {
-              let ketQua = danhSachData;
+              let ketQua = danhSachData.filter(t => !t.luuTru);
               if (locHienTai !== "tat-ca") {
                   ketQua = ketQua.filter(task => task.danhSach === locHienTai);
               }
@@ -1287,8 +1461,8 @@
                   if (!val) return;
                   let label = val === "tat-ca" ? "Tất cả" : val;
                   let so    = val === "tat-ca"
-                      ? danhSachData.length
-                      : danhSachData.filter(t => t.danhSach === val).length;
+                      ? danhSachData.filter(t => !t.luuTru).length
+                      : danhSachData.filter(t => !t.luuTru && t.danhSach === val).length;
                   nut.textContent = so > 0 ? label + " (" + so + ")" : label;
               });
           }
@@ -1791,14 +1965,38 @@
               panel.innerHTML = "";
 
               let [nam, thang, ngay] = ngayDay.split("-");
-              let tieuDe = document.createElement("div");
-              tieuDe.className = "lich-panel-tieu-de";
-              tieuDe.textContent = "Ngày " + ngay + "/" + thang;
-              panel.appendChild(tieuDe);
 
               let taskHom = danhSachData.filter(function(task) {
                   return task.deadline && task.deadline.split("T")[0] === ngayDay;
               });
+
+              // Header: tiêu đề + nút xóa tất cả
+              let header = document.createElement("div");
+              header.style.cssText = "display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;";
+
+              let tieuDe = document.createElement("div");
+              tieuDe.className = "lich-panel-tieu-de";
+              tieuDe.style.marginBottom = "0";
+              tieuDe.textContent = "Ngày " + ngay + "/" + thang;
+              header.appendChild(tieuDe);
+
+              if (taskHom.length > 0) {
+                  let btnXoaTatCa = document.createElement("button");
+                  btnXoaTatCa.className = "btn-toolbar nguy-hiem";
+                  btnXoaTatCa.style.fontSize = "12px";
+                  btnXoaTatCa.textContent = "✕ Xóa tất cả";
+                  btnXoaTatCa.onclick = function() {
+                      hienModal("Xóa toàn bộ " + taskHom.length + " task ngày " + ngay + "/" + thang + "?", "Xóa tất cả", function() {
+                          let ids = taskHom.map(t => t.id);
+                          danhSachData = danhSachData.filter(t => !ids.includes(t.id));
+                          luuDuLieu();
+                          veLich();
+                      });
+                  };
+                  header.appendChild(btnXoaTatCa);
+              }
+
+              panel.appendChild(header);
 
               if (taskHom.length === 0) {
                   let trong = document.createElement("div");
@@ -1823,8 +2021,19 @@
                   ten.className = "lich-task-ten";
                   ten.textContent = task.tenCongViec;
 
-                  item.appendChild(gio);
-                  item.appendChild(ten);
+                  // Click vào tên/giờ để toggle hoàn thành
+                  let clickArea = document.createElement("div");
+                  clickArea.style.cssText = "display:flex;align-items:center;gap:10px;flex:1;cursor:pointer;";
+                  clickArea.appendChild(gio);
+                  clickArea.appendChild(ten);
+                  clickArea.onclick = function() {
+                      let index = danhSachData.indexOf(task);
+                      danhSachData[index].hoànThành = !danhSachData[index].hoànThành;
+                      luuDuLieu();
+                      veLich();
+                  };
+
+                  item.appendChild(clickArea);
 
                   if (task.danhSach) {
                       let ds = document.createElement("span");
@@ -1833,12 +2042,21 @@
                       item.appendChild(ds);
                   }
 
-                  item.onclick = function() {
-                      let index = danhSachData.indexOf(task);
-                      danhSachData[index].hoànThành = !danhSachData[index].hoànThành;
-                      luuDuLieu();
-                      veLich();
+                  // Nút xóa từng task
+                  let btnXoa = document.createElement("button");
+                  btnXoa.className = "lich-task-xoa";
+                  btnXoa.textContent = "✕";
+                  btnXoa.title = "Xóa";
+                  btnXoa.onclick = function(e) {
+                      e.stopPropagation();
+                      hienModal('Xóa task "' + task.tenCongViec + '"?', "Xóa", function() {
+                          let idx = danhSachData.findIndex(t => t.id === task.id);
+                          if (idx !== -1) danhSachData.splice(idx, 1);
+                          luuDuLieu();
+                          veLich();
+                      });
                   };
+                  item.appendChild(btnXoa);
 
                   panel.appendChild(item);
               });
@@ -1873,6 +2091,149 @@
 
           setInterval(kiemTraDeadline, 60 * 1000);
           kiemTraDeadline();
+
+          // ============================================
+          // LƯU TRỮ TẤT CẢ
+          // ============================================
+          function capNhatGioLuuTru() {
+              let el = document.getElementById("luu-tru-footer-gio");
+              if (!el) return;
+              let now = new Date();
+              let h = String(now.getHours()).padStart(2, "0");
+              let m = String(now.getMinutes()).padStart(2, "0");
+              let d = String(now.getDate()).padStart(2, "0");
+              let mo = String(now.getMonth() + 1).padStart(2, "0");
+              el.textContent = d + "/" + mo + " " + h + ":" + m;
+          }
+          capNhatGioLuuTru();
+          setInterval(capNhatGioLuuTru, 60000);
+
+          function luuTruTatCa() {
+              let chuaLuu = danhSachData.filter(t => !t.luuTru);
+              if (chuaLuu.length === 0) {
+                  hienModal("Không có task nào để lưu trữ!", "Đóng", function() {}, true);
+                  return;
+              }
+              let hom = new Date().toISOString().split("T")[0];
+              hienModal("Lưu trữ toàn bộ " + chuaLuu.length + " task hôm nay?\nDanh sách sẽ được xóa sạch để bắt đầu ngày mới.", "Lưu trữ", function() {
+                  danhSachData.forEach(function(t) {
+                      if (!t.luuTru) {
+                          t.luuTru = true;
+                          t.ngayLuuTru = hom;
+                      }
+                  });
+                  luuDuLieu();
+                  veGiaoDien();
+                  if (luuTruMoDang) veLuuTru();
+              });
+          }
+
+          // ============================================
+          // LƯU TRỮ
+          // ============================================
+          let luuTruMoDang = false;
+
+          function batTatLuuTru() {
+              luuTruMoDang = !luuTruMoDang;
+              document.getElementById("luu-tru-noi-dung").style.display = luuTruMoDang ? "block" : "none";
+              document.getElementById("luu-tru-toggle").textContent = luuTruMoDang ? "▾" : "▸";
+              if (luuTruMoDang) veLuuTru();
+          }
+
+          function veLuuTru() {
+              let wrap = document.getElementById("luu-tru-noi-dung");
+              wrap.innerHTML = "";
+
+              let dsLuuTru = danhSachData.filter(t => t.luuTru);
+
+              // Cập nhật tiêu đề số lượng
+              let soLT = dsLuuTru.length;
+              document.getElementById("luu-tru-title").textContent = "📦 Lưu trữ" + (soLT > 0 ? " (" + soLT + ")" : "");
+
+              if (dsLuuTru.length === 0) {
+                  let trong = document.createElement("div");
+                  trong.className = "luu-tru-trong";
+                  trong.textContent = "Chưa có task nào được lưu trữ";
+                  wrap.appendChild(trong);
+                  return;
+              }
+
+              // Nhóm theo ngày lưu trữ
+              let nhom = {};
+              dsLuuTru.forEach(function(task) {
+                  let ngay = task.ngayLuuTru || "Không rõ ngày";
+                  if (!nhom[ngay]) nhom[ngay] = [];
+                  nhom[ngay].push(task);
+              });
+
+              Object.keys(nhom).sort().reverse().forEach(function(ngay) {
+                  let nhomDiv = document.createElement("div");
+                  nhomDiv.className = "luu-tru-nhom";
+
+                  let tieuDeNgay = document.createElement("div");
+                  tieuDeNgay.className = "luu-tru-ngay";
+                  // Format ngày
+                  if (ngay !== "Không rõ ngày") {
+                      let [nam, thang, ng] = ngay.split("-");
+                      tieuDeNgay.textContent = ng + "/" + thang + "/" + nam;
+                  } else {
+                      tieuDeNgay.textContent = ngay;
+                  }
+                  nhomDiv.appendChild(tieuDeNgay);
+
+                  nhom[ngay].forEach(function(task) {
+                      let item = document.createElement("div");
+                      item.className = "luu-tru-item";
+
+                      let ten = document.createElement("span");
+                      ten.className = "luu-tru-ten";
+                      ten.textContent = task.tenCongViec;
+
+                      item.appendChild(ten);
+
+                      if (task.danhSach) {
+                          let ds = document.createElement("span");
+                          ds.className = "luu-tru-ds";
+                          ds.textContent = task.danhSach;
+                          item.appendChild(ds);
+                      }
+
+                      let btnKhoiPhuc = document.createElement("button");
+                      btnKhoiPhuc.className = "btn-khoi-phuc";
+                      btnKhoiPhuc.textContent = "Khôi phục";
+                      btnKhoiPhuc.onclick = function() {
+                          let idx = danhSachData.findIndex(t => t.id === task.id);
+                          if (idx !== -1) {
+                              delete danhSachData[idx].luuTru;
+                              delete danhSachData[idx].ngayLuuTru;
+                          }
+                          luuDuLieu();
+                          veGiaoDien();
+                          veLuuTru();
+                      };
+
+                      let btnXoaHan = document.createElement("button");
+                      btnXoaHan.className = "btn-khoi-phuc";
+                      btnXoaHan.style.color = "var(--text-muted)";
+                      btnXoaHan.textContent = "✕";
+                      btnXoaHan.title = "Xóa vĩnh viễn";
+                      btnXoaHan.onclick = function() {
+                          hienModal('Xóa vĩnh viễn "' + task.tenCongViec + '"?', "Xóa", function() {
+                              let idx = danhSachData.findIndex(t => t.id === task.id);
+                              if (idx !== -1) danhSachData.splice(idx, 1);
+                              luuDuLieu();
+                              veLuuTru();
+                          });
+                      };
+
+                      item.appendChild(btnKhoiPhuc);
+                      item.appendChild(btnXoaHan);
+                      nhomDiv.appendChild(item);
+                  });
+
+                  wrap.appendChild(nhomDiv);
+              });
+          }
 
           // ============================================
           // KHỞI TẠO UI + EXPOSE LÊN WINDOW CHO FIREBASE
