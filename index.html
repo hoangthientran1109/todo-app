@@ -2310,13 +2310,13 @@
               const today = layNgayHomNay();
               const tomorrow = toTomorrowKey(today);
 
-              const todays = danhSachData.filter(t => !t.luuTru && !t.hoànThành && toDateKeyFromDeadline(t.deadline) === today);
+              const todays = danhSachData.filter(t => !t.luuTru && toDateKeyFromDeadline(t.deadline) === today);
               if (!todays.length) {
-                  hienModal("Không có task nào (chưa hoàn thành) của hôm nay để copy.", "OK", null, true);
+                  hienModal("Không có task nào của hôm nay để copy.", "OK", null, true);
                   return;
               }
 
-              const existingTomorrow = danhSachData.filter(t => !t.luuTru && !t.hoànThành && toDateKeyFromDeadline(t.deadline) === tomorrow);
+              const existingTomorrow = danhSachData.filter(t => !t.luuTru && toDateKeyFromDeadline(t.deadline) === tomorrow);
               const norm = (s) => String(s || "").trim().toLowerCase();
               const existingKey = new Set(existingTomorrow.map(t => norm(t.tenCongViec) + "|" + norm(t.danhSach || "")));
 
