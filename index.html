@@ -1138,7 +1138,8 @@
               </div>
 
               <div class="toolbar">
-                  <div style="display:flex; gap:6px;">
+                  <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                      <button class="btn-toolbar" onclick="copyHomNaySangNgayMai()">⧉ Copy → Ngày mai</button>
                       <button class="btn-toolbar nguy-hiem" onclick="xoaTatCaHoanThanh()">✕ Xóa đã hoàn thành</button>
                       <button class="btn-toolbar nguy-hiem" onclick="xoaTatCa()">✕ Xóa tất cả</button>
                   </div>
@@ -2291,6 +2292,69 @@
 
           function nhimEnter(event) {
               if (event.key === "Enter") themCongViec();
+          }
+
+          function toDateKeyFromDeadline(deadline) {
+              if (!deadline) return null;
+              return String(deadline).split("T")[0] || null;
+          }
+
+          function toTomorrowKey(dateKey) {
+              const base = dateKey || layNgayHomNay();
+              const d = new Date(base + "T00:00:00");
+              d.setDate(d.getDate() + 1);
+              return d.toISOString().split("T")[0];
+          }
+
+          function copyHomNaySangNgayMai() {
+              const today = layNgayHomNay();
+              const tomorrow = toTomorrowKey(today);
+
+              const todays = danhSachData.filter(t => !t.luuTru && !t.hoànThành && toDateKeyFromDeadline(t.deadline) === today);
+              if (!todays.length) {
+                  hienModal("Không có task nào (chưa hoàn thành) của hôm nay để copy.", "OK", null, true);
+                  return;
+              }
+
+              const existingTomorrow = danhSachData.filter(t => !t.luuTru && !t.hoànThành && toDateKeyFromDeadline(t.deadline) === tomorrow);
+              const norm = (s) => String(s || "").trim().toLowerCase();
+              const existingKey = new Set(existingTomorrow.map(t => norm(t.tenCongViec) + "|" + norm(t.danhSach || "")));
+
+              let added = 0;
+
+              todays.forEach(t => {
+                  const key = norm(t.tenCongViec) + "|" + norm(t.danhSach || "");
+                  if (existingKey.has(key)) return;
+                  existingKey.add(key);
+
+                  let newDeadline = null;
+                  if (t.deadline) {
+                      const parts = String(t.deadline).split("T");
+                      const time = parts[1] || "09:00";
+                      newDeadline = tomorrow + "T" + time;
+                  } else {
+                      newDeadline = tomorrow + "T09:00";
+                  }
+
+                  danhSachData.push({
+                      id:         Date.now() + "_" + Math.random().toString(36).slice(2),
+                      tenCongViec: t.tenCongViec,
+                      hoànThành:  false,
+                      deadline:   newDeadline,
+                      danhSach:   t.danhSach || null,
+                      laMoi:      true
+                  });
+                  added++;
+              });
+
+              if (!added) {
+                  hienModal("Ngày mai đã có sẵn các task tương tự. Không có gì để copy thêm.", "OK", null, true);
+                  return;
+              }
+
+              luuDuLieu();
+              veGiaoDien();
+              hienModal("Đã copy " + added + " task từ hôm nay sang ngày mai.", "OK", null, true);
           }
 
           function themCongViec() {
