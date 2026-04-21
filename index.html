@@ -1139,7 +1139,6 @@
 
               <div class="toolbar">
                   <div style="display:flex; gap:6px; flex-wrap:wrap;">
-                      <button class="btn-toolbar" onclick="copyHomNaySangNgayMai()">⧉ Copy → Ngày mai</button>
                       <button class="btn-toolbar nguy-hiem" onclick="xoaTatCaHoanThanh()">✕ Xóa đã hoàn thành</button>
                       <button class="btn-toolbar nguy-hiem" onclick="xoaTatCa()">✕ Xóa tất cả</button>
                   </div>
@@ -1165,7 +1164,10 @@
 
               <div class="luu-tru-footer" id="luu-tru-footer">
                   <span id="luu-tru-footer-gio" class="luu-tru-footer-gio"></span>
-                  <button class="btn-luu-tru" onclick="luuTruTatCa()">Lưu trữ</button>
+                  <div style="display:flex; gap:8px; align-items:center;">
+                      <button class="btn-luu-tru" onclick="copyHomNaySangNgayMai()">⧉ Copy → Ngày mai</button>
+                      <button class="btn-luu-tru" onclick="luuTruTatCa()">Lưu trữ</button>
+                  </div>
               </div>
 
 
@@ -2270,7 +2272,11 @@
           // HÀM TIỆN ÍCH
           // ============================================
           function layNgayHomNay() {
-              return new Date().toISOString().split("T")[0];
+              const now = new Date();
+              const y = now.getFullYear();
+              const m = String(now.getMonth() + 1).padStart(2, "0");
+              const d = String(now.getDate()).padStart(2, "0");
+              return y + "-" + m + "-" + d;
           }
 
           function dinhDangNgay(chuoiNgay) {
