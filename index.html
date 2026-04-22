@@ -2117,7 +2117,7 @@
                   hienModal("Không có task nào để lưu trữ!", "Đóng", function() {}, true);
                   return;
               }
-              let hom = new Date().toISOString().split("T")[0];
+              let hom = layNgayHomNay();
               hienModal("Lưu trữ toàn bộ " + chuaLuu.length + " task hôm nay?\nDanh sách sẽ được xóa sạch để bắt đầu ngày mới.", "Lưu trữ", function() {
                   danhSachData.forEach(function(t) {
                       if (!t.luuTru) {
@@ -2307,9 +2307,12 @@
 
           function toTomorrowKey(dateKey) {
               const base = dateKey || layNgayHomNay();
-              const d = new Date(base + "T00:00:00");
-              d.setDate(d.getDate() + 1);
-              return d.toISOString().split("T")[0];
+              const [y, m, d] = base.split("-").map(Number);
+              const next = new Date(y, m - 1, d + 1);
+              const yy = next.getFullYear();
+              const mm = String(next.getMonth() + 1).padStart(2, "0");
+              const dd = String(next.getDate()).padStart(2, "0");
+              return yy + "-" + mm + "-" + dd;
           }
 
           function copyHomNaySangNgayMai() {
@@ -2322,17 +2325,9 @@
                   return;
               }
 
-              const existingTomorrow = danhSachData.filter(t => !t.luuTru && toDateKeyFromDeadline(t.deadline) === tomorrow);
-              const norm = (s) => String(s || "").trim().toLowerCase();
-              const existingKey = new Set(existingTomorrow.map(t => norm(t.tenCongViec) + "|" + norm(t.danhSach || "")));
-
               let added = 0;
 
               todays.forEach(t => {
-                  const key = norm(t.tenCongViec) + "|" + norm(t.danhSach || "");
-                  if (existingKey.has(key)) return;
-                  existingKey.add(key);
-
                   let newDeadline = null;
                   if (t.deadline) {
                       const parts = String(t.deadline).split("T");
@@ -2353,14 +2348,9 @@
                   added++;
               });
 
-              if (!added) {
-                  hienModal("Ngày mai đã có sẵn các task tương tự. Không có gì để copy thêm.", "OK", null, true);
-                  return;
-              }
-
               luuDuLieu();
               veGiaoDien();
-              hienModal("Đã copy " + added + " task từ hôm nay sang ngày mai.", "OK", null, true);
+              hienModal("Đã copy toàn bộ " + added + " task từ hôm nay sang ngày mai.", "OK", null, true);
           }
 
           function themCongViec() {
