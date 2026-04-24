@@ -419,10 +419,41 @@
               border-bottom: 1px solid var(--border);
               padding-bottom: 4px;
               margin-bottom: 8px;
+              flex: 1;
           }
 
           .tieu-de-ngay.hom-nay { color: var(--btn-primary); }
           .tieu-de-ngay.qua-han { color: #c0392b; }
+
+          .tieu-de-ngay-container {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              gap: 8px;
+          }
+
+          .btn-luu-tru-ngay {
+              background: transparent;
+              border: 1px solid var(--border);
+              border-radius: 6px;
+              padding: 4px 10px;
+              font-size: 12px;
+              color: var(--text-sub);
+              cursor: pointer;
+              font-family: 'Lora', Georgia, serif;
+              transition: all 0.2s;
+              white-space: nowrap;
+          }
+
+          .btn-luu-tru-ngay:hover {
+              border-color: var(--btn-primary);
+              color: var(--btn-primary);
+              background: rgba(139, 111, 71, 0.08);
+          }
+
+          .btn-luu-tru-ngay:active {
+              background: rgba(139, 111, 71, 0.15);
+          }
 
           ul { list-style: none; }
 
@@ -1501,6 +1532,9 @@
                   let nhom   = document.createElement("div");
                   nhom.className = "nhom-ngay";
 
+                  let headerContainer = document.createElement("div");
+                  headerContainer.className = "tieu-de-ngay-container";
+
                   let tieuDe = document.createElement("div");
                   tieuDe.className = "tieu-de-ngay";
 
@@ -1515,7 +1549,15 @@
                       tieuDe.textContent = dinhDangNgay(ngay);
                   }
 
-                  nhom.appendChild(tieuDe);
+                  headerContainer.appendChild(tieuDe);
+
+                  let nutLuuTru = document.createElement("button");
+                  nutLuuTru.className = "btn-luu-tru-ngay";
+                  nutLuuTru.textContent = "Lưu trữ";
+                  nutLuuTru.onclick = function() { luuTruTheoNgay(ngay); };
+                  headerContainer.appendChild(nutLuuTru);
+
+                  nhom.appendChild(headerContainer);
                   let ul = document.createElement("ul");
                   nhomTheoNgay[ngay].forEach(function(task) {
                       ul.appendChild(taoLiElement(task, danhSachData.indexOf(task)));
@@ -2110,6 +2152,120 @@
           }
           capNhatGioLuuTru();
           setInterval(capNhatGioLuuTru, 60000);
+
+          // ============================================
+          // LƯU TRỮ THEO NGÀY
+          // ============================================
+          function luuTruTheoNgay(ngayStr) {
+              let tasksTheoNgay = danhSachData.filter(t =>
+                  !t.luuTru &&
+                  t.deadline &&
+                  t.deadline.split("T")[0] === ngayStr
+              );
+
+              if (tasksTheoNgay.length === 0) {
+                  hienModal("Không có task nào cần lưu trữ vào ngày " + dinhDangNgay(ngayStr),
+                            "Đóng", function() {}, true);
+                  return;
+              }
+
+              let hoangThanhCount = tasksTheoNgay.filter(t => t.hoànThành).length;
+              let chuaHtCount = tasksTheoNgay.length - hoangThanhCount;
+
+              let modal = document.createElement("div");
+              modal.className = "modal-overlay";
+              modal.style.display = "flex";
+              modal.style.justifyContent = "center";
+              modal.style.alignItems = "center";
+              modal.style.position = "fixed";
+              modal.style.top = "0";
+              modal.style.left = "0";
+              modal.style.width = "100%";
+              modal.style.height = "100%";
+              modal.style.backgroundColor = "rgba(0,0,0,0.5)";
+              modal.style.zIndex = "9999";
+
+              let content = document.createElement("div");
+              content.className = "modal-content";
+              content.style.backgroundColor = "var(--bg-card)";
+              content.style.borderRadius = "8px";
+              content.style.padding = "24px";
+              content.style.minWidth = "320px";
+              content.style.maxWidth = "500px";
+
+              let message = document.createElement("div");
+              message.className = "modal-msg";
+              message.innerHTML = "Lưu trữ tasks của <strong>" + dinhDangNgay(ngayStr) + "</strong>?<br><br>" +
+                                 "• Chưa hoàn thành: " + chuaHtCount +
+                                 "<br>• Đã hoàn thành: " + hoangThanhCount;
+              content.appendChild(message);
+
+              let buttons = document.createElement("div");
+              buttons.className = "modal-nut";
+              buttons.style.display = "flex";
+              buttons.style.gap = "8px";
+              buttons.style.flexDirection = "column";
+
+              let btn1 = document.createElement("button");
+              btn1.className = "btn-modal-ok";
+              btn1.textContent = "Lưu trữ chỉ đã hoàn thành";
+              btn1.onclick = function() {
+                  tasksTheoNgay.forEach(t => {
+                      if (t.hoànThành) {
+                          t.luuTru = true;
+                          t.ngayLuuTru = ngayStr;
+                      }
+                  });
+                  luuDuLieu();
+                  veGiaoDien();
+                  if (luuTruMoDang) veLuuTru();
+                  modal.remove();
+              };
+              buttons.appendChild(btn1);
+
+              let btn2 = document.createElement("button");
+              btn2.className = "btn-modal-ok";
+              btn2.textContent = "Lưu trữ chỉ chưa hoàn thành";
+              btn2.onclick = function() {
+                  tasksTheoNgay.forEach(t => {
+                      if (!t.hoànThành) {
+                          t.luuTru = true;
+                          t.ngayLuuTru = ngayStr;
+                      }
+                  });
+                  luuDuLieu();
+                  veGiaoDien();
+                  if (luuTruMoDang) veLuuTru();
+                  modal.remove();
+              };
+              buttons.appendChild(btn2);
+
+              let btn3 = document.createElement("button");
+              btn3.className = "btn-modal-ok";
+              btn3.textContent = "Lưu trữ tất cả";
+              btn3.onclick = function() {
+                  tasksTheoNgay.forEach(t => {
+                      t.luuTru = true;
+                      t.ngayLuuTru = ngayStr;
+                  });
+                  luuDuLieu();
+                  veGiaoDien();
+                  if (luuTruMoDang) veLuuTru();
+                  modal.remove();
+              };
+              buttons.appendChild(btn3);
+
+              let btnCancel = document.createElement("button");
+              btnCancel.className = "btn-modal-ok";
+              btnCancel.style.backgroundColor = "var(--text-muted)";
+              btnCancel.textContent = "Huỷ";
+              btnCancel.onclick = function() { modal.remove(); };
+              buttons.appendChild(btnCancel);
+
+              content.appendChild(buttons);
+              modal.appendChild(content);
+              document.body.appendChild(modal);
+          }
 
           function luuTruTatCa() {
               let chuaLuu = danhSachData.filter(t => !t.luuTru);
