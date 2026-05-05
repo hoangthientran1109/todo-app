@@ -128,7 +128,7 @@
               padding: 30px;
               border-radius: 12px;
               width: 100%;
-              max-width: 500px;
+              max-width: 700px;
               box-shadow: var(--shadow);
               transition: background-color 0.3s;
           }
@@ -208,9 +208,9 @@
           }
 
           input[type="text"],
-          input[type="datetime-local"],
+          input[type="date"],
           select {
-              padding: 10px;
+              padding: 10px 12px;
               border: 2px solid var(--border-input);
               border-radius: 8px;
               font-size: 16px;
@@ -224,18 +224,28 @@
               appearance: auto;
           }
 
-          body.dark input[type="datetime-local"] { color-scheme: dark; }
+          body.dark input[type="date"] { color-scheme: dark; }
 
           input[type="text"] { flex: 1; }
 
           input[type="text"]:focus,
-          input[type="datetime-local"]:focus,
+          input[type="date"]:focus,
           select:focus {
               outline: none;
               border-color: var(--btn-primary);
           }
 
-          select { cursor: pointer; }
+          select { cursor: pointer; padding-right: 28px; }
+
+          .thoi-gian-row {
+              display: flex;
+              gap: 6px;
+              width: 100%;
+          }
+
+          .thoi-gian-row input[type="date"] { flex: 1; min-width: 0; }
+          .thoi-gian-row select { flex: 0 0 auto; width: auto; min-width: 68px; }
+          .thoi-gian-row select.sel-ampm { min-width: 58px; }
 
           button.btn-them {
               padding: 10px 16px;
@@ -943,6 +953,7 @@
               h1 { font-size: 18px; }
 
               .input-row.hang-2 { flex-direction: column; }
+              .thoi-gian-row { width: 100%; }
 
               .toolbar { flex-direction: column; align-items: stretch; }
               .toolbar > div { display: flex; gap: 6px; }
@@ -1139,7 +1150,12 @@
                       <button class="btn-them" onclick="themCongViec()">Thêm</button>
                   </div>
                   <div class="input-row hang-2">
-                      <input type="datetime-local" id="input-deadline">
+                      <input type="date" id="input-ngay">
+                      <div class="thoi-gian-row" style="flex:1;">
+                          <select id="input-gio"></select>
+                          <select id="input-phut"></select>
+                          <select id="input-ampm" class="sel-ampm"></select>
+                      </div>
                       <select id="input-danh-sach">
                           <option value="">— Danh sách —</option>
                       </select>
@@ -1249,6 +1265,151 @@
           window.danhSachData = danhSachData;
           window.danhMucList  = danhMucList;
 
+
+          const PHUT_5 = ["00","05","10","15","20","25","30","35","40","45","50","55"];
+
+          function h24To12(h24) {
+              let h = parseInt(h24, 10);
+              let ampm = h < 12 ? "AM" : "PM";
+              let h12 = h % 12; if (h12 === 0) h12 = 12;
+              return { h12: String(h12).padStart(2, "0"), ampm: ampm };
+          }
+
+          function h12To24(h12, ampm) {
+              let h = parseInt(h12, 10);
+              if (ampm === "AM") { if (h === 12) h = 0; }
+              else { if (h !== 12) h += 12; }
+              return String(h).padStart(2, "0");
+          }
+
+          (function initGioPhut() {
+              let selGio   = document.getElementById("input-gio");
+              let selPhut  = document.getElementById("input-phut");
+              let selAmpm  = document.getElementById("input-ampm");
+              selGio.innerHTML   = '<option value="">Giờ</option>';
+              selPhut.innerHTML  = '<option value="">Phút</option>';
+              selAmpm.innerHTML  = '<option value="">—</option>';
+              for (let h = 1; h <= 12; h++) {
+                  let o = document.createElement("option");
+                  o.value = String(h).padStart(2, "0");
+                  o.textContent = String(h).padStart(2, "0");
+                  selGio.appendChild(o);
+              }
+              PHUT_5.forEach(function(m) {
+                  let o = document.createElement("option");
+                  o.value = m;
+                  o.textContent = m;
+                  selPhut.appendChild(o);
+              });
+              ["AM","PM"].forEach(function(v) {
+                  let o = document.createElement("option");
+                  o.value = v;
+                  o.textContent = v;
+                  selAmpm.appendChild(o);
+              });
+          })();
+
+          function layDeadlineTuForm() {
+              let ngay  = document.getElementById("input-ngay").value;
+              let gio   = document.getElementById("input-gio").value;
+              let phut  = document.getElementById("input-phut").value;
+              let ampm  = document.getElementById("input-ampm").value;
+              if (!ngay) return null;
+              if (!gio && !phut) return ngay;
+              let g = gio || "09";
+              let a = ampm || "AM";
+              let p = phut || "00";
+              return ngay + "T" + h12To24(g, a) + ":" + p;
+          }
+
+          function datVaoForm(dl) {
+              let ngay  = document.getElementById("input-ngay");
+              let gio   = document.getElementById("input-gio");
+              let phut  = document.getElementById("input-phut");
+              let ampm  = document.getElementById("input-ampm");
+              if (!dl) { ngay.value = ""; gio.value = ""; phut.value = ""; ampm.value = ""; return; }
+              let [d, t] = dl.split("T");
+              ngay.value = d;
+              if (t) {
+                  let [h, m] = t.split(":");
+                  let c = h24To12(h);
+                  gio.value = c.h12;
+                  ampm.value = c.ampm;
+                  let snapped = String(Math.round(parseInt(m,10)/5)*5).padStart(2,"0");
+                  if (snapped === "60") snapped = "55";
+                  phut.value = snapped;
+              } else {
+                  gio.value = ""; phut.value = ""; ampm.value = "";
+              }
+          }
+
+          function layDeadlineTuFormSua(ngayEl, gioEl, phutEl, ampmEl) {
+              let ngay  = ngayEl.value;
+              let gio   = gioEl.value;
+              let phut  = phutEl.value;
+              let ampm  = ampmEl.value;
+              if (!ngay) return null;
+              if (!gio && !phut) return ngay;
+              let g = gio || "09";
+              let a = ampm || "AM";
+              let p = phut || "00";
+              return ngay + "T" + h12To24(g, a) + ":" + p;
+          }
+
+          function taoHangGioPhut() {
+              let row = document.createElement("div");
+              row.className = "thoi-gian-row";
+              let ngayEl = document.createElement("input");
+              ngayEl.type = "date";
+              ngayEl.className = "input-sua";
+              let gioEl = document.createElement("select");
+              gioEl.className = "input-sua";
+              gioEl.innerHTML = '<option value="">Giờ</option>';
+              for (let h = 1; h <= 12; h++) {
+                  let o = document.createElement("option");
+                  o.value = String(h).padStart(2, "0");
+                  o.textContent = String(h).padStart(2, "0");
+                  gioEl.appendChild(o);
+              }
+              let phutEl = document.createElement("select");
+              phutEl.className = "input-sua";
+              phutEl.innerHTML = '<option value="">Phút</option>';
+              PHUT_5.forEach(function(m) {
+                  let o = document.createElement("option");
+                  o.value = m;
+                  o.textContent = m;
+                  phutEl.appendChild(o);
+              });
+              let ampmEl = document.createElement("select");
+              ampmEl.className = "input-sua sel-ampm";
+              ampmEl.innerHTML = '<option value="">—</option>';
+              ["AM","PM"].forEach(function(v) {
+                  let o = document.createElement("option");
+                  o.value = v;
+                  o.textContent = v;
+                  ampmEl.appendChild(o);
+              });
+              row.appendChild(ngayEl);
+              row.appendChild(gioEl);
+              row.appendChild(phutEl);
+              row.appendChild(ampmEl);
+              return { row, ngayEl, gioEl, phutEl, ampmEl };
+          }
+
+          function datGioPhut(ngayEl, gioEl, phutEl, ampmEl, dl) {
+              if (!dl) return;
+              let [d, t] = dl.split("T");
+              ngayEl.value = d;
+              if (t) {
+                  let [h, m] = t.split(":");
+                  let c = h24To12(h);
+                  gioEl.value = c.h12;
+                  ampmEl.value = c.ampm;
+                  let snapped = String(Math.round(parseInt(m,10)/5)*5).padStart(2,"0");
+                  if (snapped === "60") snapped = "55";
+                  phutEl.value = snapped;
+              }
+          }
 
           function luuDanhMuc() {
               localStorage.setItem("categories", JSON.stringify(danhMucList));
@@ -1690,46 +1851,44 @@
               khoi.style.flexDirection = "column";
               khoi.style.gap = "6px";
 
-              let inputSua = document.createElement("input");
-              inputSua.type = "text";
-              inputSua.className = "input-sua";
-              inputSua.value = danhSachData[index].tenCongViec;
+               let inputSua = document.createElement("input");
+               inputSua.type = "text";
+               inputSua.className = "input-sua";
+               inputSua.value = danhSachData[index].tenCongViec;
 
-              let inputDeadlineSua = document.createElement("input");
-              inputDeadlineSua.type = "datetime-local";
-              inputDeadlineSua.className = "input-sua";
-              inputDeadlineSua.value = danhSachData[index].deadline || "";
+               let tp = taoHangGioPhut();
+               datGioPhut(tp.ngayEl, tp.gioEl, tp.phutEl, tp.ampmEl, danhSachData[index].deadline);
 
-              let selectSua = document.createElement("select");
-              selectSua.className = "input-sua";
-              selectSua.innerHTML = '<option value="">— Danh sách —</option>';
-              danhMucList.forEach(function(ten) {
-                  let opt = document.createElement("option");
-                  opt.value = ten;
-                  opt.textContent = ten;
-                  selectSua.appendChild(opt);
-              });
-              selectSua.value = danhSachData[index].danhSach || "";
+               let selectSua = document.createElement("select");
+               selectSua.className = "input-sua";
+               selectSua.innerHTML = '<option value="">— Danh sách —</option>';
+               danhMucList.forEach(function(ten) {
+                   let opt = document.createElement("option");
+                   opt.value = ten;
+                   opt.textContent = ten;
+                   selectSua.appendChild(opt);
+               });
+               selectSua.value = danhSachData[index].danhSach || "";
 
-              khoi.appendChild(inputSua);
-              khoi.appendChild(inputDeadlineSua);
-              khoi.appendChild(selectSua);
+               khoi.appendChild(inputSua);
+               khoi.appendChild(tp.row);
+               khoi.appendChild(selectSua);
 
-              let nutLuu = document.createElement("button");
-              nutLuu.textContent = "✓";
-              nutLuu.title = "Lưu";
+               let nutLuu = document.createElement("button");
+               nutLuu.textContent = "✓";
+               nutLuu.title = "Lưu";
 
-              function luuSua() {
-                  let noiDungMoi = inputSua.value.trim();
-                  if (noiDungMoi === "") {
-                      alert("Tên công việc không được để trống!");
-                      return;
-                  }
-                  let idx = danhSachData.findIndex(t => t.id === taskId);
-                  if (idx === -1) return;
-                  danhSachData[idx].tenCongViec = noiDungMoi;
-                  danhSachData[idx].deadline    = inputDeadlineSua.value || null;
-                  danhSachData[idx].danhSach    = selectSua.value || null;
+               function luuSua() {
+                   let noiDungMoi = inputSua.value.trim();
+                   if (noiDungMoi === "") {
+                       alert("Tên công việc không được để trống!");
+                       return;
+                   }
+                   let idx = danhSachData.findIndex(t => t.id === taskId);
+                   if (idx === -1) return;
+                   danhSachData[idx].tenCongViec = noiDungMoi;
+                   danhSachData[idx].deadline    = layDeadlineTuFormSua(tp.ngayEl, tp.gioEl, tp.phutEl, tp.ampmEl);
+                   danhSachData[idx].danhSach    = selectSua.value || null;
                   luuDuLieu();
                   veGiaoDien();
               }
@@ -2442,7 +2601,8 @@
           function dinhDangGio(chuoiDatetime) {
               let [ngay, gio] = chuoiDatetime.split("T");
               let [h, m] = gio.split(":");
-              return h + ":" + m;
+              let c = h24To12(h);
+              return c.h12 + ":" + m + " " + c.ampm;
           }
 
           function luuDuLieu() {
@@ -2485,12 +2645,12 @@
               todays.forEach(t => {
                   let newDeadline = null;
                   if (t.deadline) {
-                      const parts = String(t.deadline).split("T");
-                      const time = parts[1] || "09:00";
-                      newDeadline = tomorrow + "T" + time;
-                  } else {
-                      newDeadline = tomorrow + "T09:00";
-                  }
+                       const parts = String(t.deadline).split("T");
+                       const time = parts[1] || "09:00";
+                       newDeadline = tomorrow + "T" + time;
+                   } else {
+                       newDeadline = tomorrow + "T09:00";
+                   }
 
                   danhSachData.push({
                       id:         Date.now() + "_" + Math.random().toString(36).slice(2),
@@ -2508,34 +2668,35 @@
               hienModal("Đã copy toàn bộ " + added + " task từ hôm nay sang ngày mai.", "OK", null, true);
           }
 
-          function themCongViec() {
-              let input         = document.getElementById("input-cong-viec");
-              let inputDeadline = document.getElementById("input-deadline");
-              let inputDanhSach = document.getElementById("input-danh-sach");
-              let congViec      = input.value.trim();
 
-              if (congViec === "") {
-                  alert("Bạn chưa nhập công việc!");
-                  return;
-              }
 
-               danhSachData.push({
-                  id:         Date.now() + "_" + Math.random().toString(36).slice(2),
-                  tenCongViec: congViec,
-                  hoànThành:  false,
-                  deadline:   inputDeadline.value || null,
-                  danhSach:   inputDanhSach.value || null,
-                  laMoi:      true
-              });
+           function themCongViec() {
+               let input         = document.getElementById("input-cong-viec");
+               let inputDanhSach = document.getElementById("input-danh-sach");
+               let congViec      = input.value.trim();
 
-              luuDuLieu();
-              veGiaoDien();
+               if (congViec === "") {
+                   alert("Bạn chưa nhập công việc!");
+                   return;
+               }
 
-              input.value         = "";
-              inputDeadline.value = "";
-              inputDanhSach.value = "";
-              input.focus();
-          }
+                danhSachData.push({
+                   id:         Date.now() + "_" + Math.random().toString(36).slice(2),
+                   tenCongViec: congViec,
+                   hoànThành:  false,
+                    deadline:   layDeadlineTuForm(),
+                   danhSach:   inputDanhSach.value || null,
+                   laMoi:      true
+               });
+
+               luuDuLieu();
+               veGiaoDien();
+
+               input.value = "";
+               datVaoForm(null);
+               inputDanhSach.value = "";
+               input.focus();
+           }
 
       </script>
 
