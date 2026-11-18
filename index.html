@@ -1102,9 +1102,107 @@
           #input-danh-sach, #input-lap { flex: 1 1 110px; min-width: 0; width: auto; }
           @media (max-width: 480px) { #input-danh-sach, #input-lap { flex: 0 0 auto; width: 100%; } }
           input.con-input[type="text"] { padding: 6px 10px; font-size: 14px; border-width: 1px; }
+
+          /* ===== Mặt bàn làm việc (nền + ánh sáng + đồ vật hai bên) ===== */
+          .container { z-index: 1; }
+          #desk { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+          .anh-sang { position: absolute; inset: 0; opacity: 0; transition: opacity 2.5s ease; }
+          body.dark .anh-sang { filter: brightness(0.7); }
+          .as-sang  { background: radial-gradient(ellipse 70% 65% at 0% 0%, rgba(255,214,150,0.38), transparent 72%),
+                                  repeating-linear-gradient(115deg, transparent 0 90px, rgba(255,240,200,0.10) 90px 150px);
+                      -webkit-mask-image: linear-gradient(135deg, #000, transparent 65%); mask-image: linear-gradient(135deg, #000, transparent 65%); }
+          .as-trua  { background: radial-gradient(ellipse 80% 55% at 50% -10%, rgba(255,255,255,0.45), transparent 72%); }
+          .as-chieu { background: radial-gradient(ellipse 70% 70% at 100% 15%, rgba(255,166,86,0.36), transparent 72%),
+                                  repeating-linear-gradient(65deg, transparent 0 90px, rgba(255,190,120,0.10) 90px 150px);
+                      -webkit-mask-image: linear-gradient(225deg, #000, transparent 65%); mask-image: linear-gradient(225deg, #000, transparent 65%); }
+          .as-toi   { background: radial-gradient(circle at 10% 74%, rgba(255,196,120,0.30), transparent 34%),
+                                  linear-gradient(rgba(20,30,70,0.16), rgba(20,30,70,0.30)); }
+          body[data-buoi="sang"]  .as-sang, body[data-buoi="sang"]  .as-bui,
+          body[data-buoi="trua"]  .as-trua,
+          body[data-buoi="chieu"] .as-chieu, body[data-buoi="chieu"] .as-bui,
+          body[data-buoi="toi"]   .as-toi { opacity: 1; }
+          .bui { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: rgba(255,236,190,0.85); animation: troiBui linear infinite; }
+          @keyframes troiBui { 0% { transform: translate(0,0); opacity: 0; } 20%,80% { opacity: 0.7; } 100% { transform: translate(40px,-60px); opacity: 0; } }
+
+          .desk-side { position: absolute; top: 0; bottom: 0; width: calc((100vw - 800px) / 2); display: none;
+                       flex-direction: column; align-items: center; justify-content: space-evenly; padding: 8vh 0; }
+          .desk-left { left: 0; } .desk-right { right: 0; }
+          @media (min-width: 1200px) { .desk-side { display: flex; } }
+          .deco { color: var(--btn-primary); opacity: 0.55; width: clamp(90px, 9vw, 170px); height: auto; }
+          .deco-pencil { transform: rotate(-24deg); width: clamp(110px, 11vw, 200px); }
+          .deco-clip { transform: rotate(18deg); width: clamp(26px, 2.4vw, 40px); }
+          .deco-glasses { transform: rotate(-8deg); }
+          .deco-plant { width: clamp(100px, 10vw, 180px); }
+          .steam { animation: hoiBay 3.2s ease-in-out infinite; transform-box: fill-box; }
+          @keyframes hoiBay { 0% { opacity: 0; transform: translateY(6px); } 50% { opacity: 0.8; } 100% { opacity: 0; transform: translateY(-8px); } }
+          @media (prefers-reduced-motion: reduce) { .steam, .bui { animation: none; } }
+
+          /* ===== Cây theo tiến độ / Pomodoro / Polaroid ===== */
+          .tuong-tac { pointer-events: auto; }
+          .deco-plant .g { opacity: 0; transform: scale(0.4); transform-origin: 70px 122px; transition: opacity 0.9s, transform 0.9s; }
+          .deco-plant .g.on { opacity: 1; transform: none; }
+          .the-pomo { width: clamp(150px, 13vw, 210px); padding: 14px 12px; border-radius: 14px; text-align: center; color: var(--text-main);
+                      background: var(--bg-card); border: 1px solid var(--border); box-shadow: var(--shadow); }
+          .pomo-gio { font-size: clamp(26px, 2.6vw, 40px); font-weight: 700; letter-spacing: 1px; }
+          .pomo-task { font-size: 12px; color: var(--text-sub); margin: 2px 0 10px; min-height: 1.3em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+          .pomo-dem { font-size: clamp(22px, 2vw, 30px); font-weight: 600; font-variant-numeric: tabular-nums; color: var(--btn-primary); }
+          .pomo-che-do { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+          .pomo-nut { display: flex; gap: 6px; justify-content: center; }
+          .pomo-nut button { border: 1px solid var(--border-input); background: var(--bg-item); color: var(--text-main); border-radius: 8px; padding: 5px 9px; font: inherit; font-size: 12px; cursor: pointer; }
+          .pomo-nut button.chinh { background: var(--btn-primary); border-color: var(--btn-primary); color: #fff; }
+          .pol { position: relative; width: clamp(110px, 10vw, 175px); padding: 7px 7px 26px; background: #fffdf8; border-radius: 3px;
+                 box-shadow: 0 6px 18px rgba(0,0,0,0.18); cursor: pointer; transition: transform 0.25s; }
+          .pol:hover { transform: rotate(0) scale(1.04) !important; }
+          .pol::before { content: ""; position: absolute; top: -9px; left: 50%; width: 44px; height: 16px; transform: translateX(-50%) rotate(-3deg);
+                         background: color-mix(in srgb, var(--btn-primary) 40%, transparent); }
+          .pol-anh { aspect-ratio: 1; background: #ece6da center / cover no-repeat; display: flex; align-items: center; justify-content: center; color: #a89c85; font-size: 12px; text-align: center; }
+          .pol-xoa { position: absolute; top: -8px; right: -8px; display: none; width: 22px; height: 22px; border-radius: 50%; border: none; cursor: pointer;
+                     background: var(--btn-primary); color: #fff; font-size: 11px; line-height: 22px; padding: 0; }
+          .pol:hover .pol-xoa { display: block; }
       </style>
   </head>
   <body>
+    <!-- Mặt bàn làm việc: nền, ánh sáng theo giờ, đồ vật hai bên -->
+    <div id="desk" aria-hidden="true">
+        <div class="anh-sang as-sang"></div><div class="anh-sang as-trua"></div>
+        <div class="anh-sang as-chieu"></div><div class="anh-sang as-toi"></div>
+        <div class="anh-sang as-bui" id="as-bui"></div>
+        <div class="desk-side desk-left">
+            <div class="pol tuong-tac" id="pol-1" style="transform:rotate(-5deg)"></div>
+            <div class="pol tuong-tac" id="pol-2" style="transform:rotate(4deg)"></div>
+            <svg class="deco deco-cup" viewBox="0 0 120 140" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+<ellipse cx="62" cy="124" rx="50" ry="9" fill="currentColor" fill-opacity=".1" stroke="none"/>
+<path class="steam" d="M44 36c-6-8 6-12 0-22"/><path class="steam" style="animation-delay:.8s" d="M62 36c-6-8 6-12 0-22"/><path class="steam" style="animation-delay:1.6s" d="M80 36c-6-8 6-12 0-22"/>
+<path d="M28 48h66v34a26 26 0 0 1-26 26H54a26 26 0 0 1-26-26z" fill="currentColor" fill-opacity=".12"/>
+<path d="M94 58h8a12 12 0 0 1 0 28h-10"/><path d="M38 58h46" opacity=".5"/></g></svg>
+            <input type="file" id="pol-file" accept="image/*" style="display:none">
+        </div>
+        <div class="desk-side desk-right">
+            <div class="the-pomo tuong-tac">
+                <div class="pomo-gio" id="pomo-gio">--:--</div>
+                <div class="pomo-task" id="pomo-task"></div>
+                <div class="pomo-dem" id="pomo-dem">25:00</div>
+                <div class="pomo-che-do" id="pomo-che-do">Tập trung</div>
+                <div class="pomo-nut">
+                    <button class="chinh" id="pomo-bt" onclick="pomoBatDau()">▶ Bắt đầu</button>
+                    <button onclick="pomoReset()" title="Đặt lại">↺</button>
+                    <button onclick="pomoDoiCheDo()" title="Đổi Tập trung / Nghỉ">⇄</button>
+                </div>
+            </div>
+            <svg class="deco deco-plant tuong-tac" id="cay" viewBox="0 0 140 190"><title>Cây hôm nay</title><g fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+<ellipse cx="70" cy="184" rx="44" ry="6" fill="currentColor" fill-opacity=".1" stroke="none"/>
+<path d="M70 122v-12"/>
+<path class="g" data-g="1" d="M70 122C70 92 66 62 70 32"/>
+<path class="g" data-g="2" d="M70 98C48 94 34 78 36 60c22 2 36 18 34 38z" fill="currentColor" fill-opacity=".12"/>
+<path class="g" data-g="3" d="M70 82C92 78 106 62 104 44c-22 2-36 18-34 38z" fill="currentColor" fill-opacity=".12"/>
+<path class="g" data-g="4" d="M70 58C56 52 50 40 54 24c14 4 22 18 16 34z" fill="currentColor" fill-opacity=".12"/>
+<path class="g" data-g="4" d="M70 40C62 26 66 14 70 6c4 8 8 20 0 34z" fill="currentColor" fill-opacity=".12"/>
+<g class="g" data-g="5" fill="currentColor" fill-opacity=".35"><circle cx="36" cy="56" r="7"/><circle cx="104" cy="40" r="7"/><circle cx="70" cy="6" r="7"/></g>
+<path d="M30 122h80v14H30z" fill="currentColor" fill-opacity=".12"/>
+<path d="M36 136h68l-8 42a8 8 0 0 1-8 6H52a8 8 0 0 1-8-6z" fill="currentColor" fill-opacity=".12"/></g></svg>
+        </div>
+    </div>
+
 
       <div class="container">
           <div class="header">
@@ -2108,6 +2206,7 @@
               let phanTram  = tatCa === 0 ? 0 : Math.round((hoànThành / tatCa) * 100);
               if (phanTram === 100 && tatCa > 0 && tatCaTruoc === tatCa && phanTramTruoc !== null && phanTramTruoc < 100) confetti();
               tatCaTruoc = tatCa; phanTramTruoc = phanTram;
+              capNhatCay(tatCa, phanTram);
 
               let progressWrap = document.getElementById("progress-wrap");
               let dem          = document.getElementById("dem");
@@ -2860,8 +2959,182 @@
               r.readAsText(f);
           }
 
+          // ---- Tự thêm task lặp lại cho hôm nay (chạy khi mở app, mỗi phút và khi quay lại tab) ----
+          function buocLap(dateKey, lap) {
+              const [y, m, d] = dateKey.split("-").map(Number);
+              const dt = new Date(y, m - 1, d);
+              dt.setDate(dt.getDate() + (lap === "tuan" ? 7 : 1));
+              if (lap === "t2t6") while (dt.getDay() === 0 || dt.getDay() === 6) dt.setDate(dt.getDate() + 1);
+              return khoaNgay(dt);
+          }
+
+          function tuTaoTaskLap() {
+              const hn = layNgayHomNay();
+              const chuoi = {};   // mỗi chuỗi = cùng tên + cùng danh sách; lấy task có ngày muộn nhất
+              danhSachData.forEach(function(t) {
+                  const day = toDateKeyFromDeadline(t.deadline);
+                  if (!day) return;
+                  const k = t.tenCongViec + "|" + (t.danhSach || "");
+                  if (!chuoi[k] || day > chuoi[k].day) chuoi[k] = { t: t, day: day };
+              });
+              let them = 0;
+              Object.values(chuoi).forEach(function(c) {
+                  if (!c.t.lap || c.day >= hn) return;   // không lặp, hoặc đã có kỳ hôm nay/tương lai
+                  let next = c.day;
+                  do { next = buocLap(next, c.t.lap); } while (next < hn);   // giữ nhịp lặp, lấy kỳ đầu tiên từ hôm nay
+                  const time = c.t.deadline.split("T")[1];
+                  const id = taoId();
+                  idMoi.add(id);
+                  danhSachData.push({ id: id, tenCongViec: c.t.tenCongViec, hoànThành: false,
+                      deadline: time ? next + "T" + time : next, danhSach: c.t.danhSach || null, lap: c.t.lap, con: copyCon(c.t) });
+                  them++;
+              });
+              if (them) { luuDuLieu(); capNhatTatCaManHinh(); }
+          }
+          setInterval(tuTaoTaskLap, 60 * 1000);
+          document.addEventListener("visibilitychange", function() { if (!document.hidden) tuTaoTaskLap(); });
+
+          // ---- Ánh sáng theo giờ + hạt bụi trong nắng ----
+          function veAnhSang() {
+              const h = new Date().getHours();
+              document.body.dataset.buoi = (h >= 5 && h < 11) ? "sang" : (h >= 11 && h < 15) ? "trua" : (h >= 15 && h < 18) ? "chieu" : "toi";
+          }
+          (function() {
+              const box = document.getElementById("as-bui");
+              if (!box) return;
+              for (let i = 0; i < 12; i++) {
+                  const b = document.createElement("i");
+                  b.className = "bui";
+                  b.style.cssText = "left:" + (Math.random() * 100) + "%;top:" + (20 + Math.random() * 70) + "%;" +
+                      "animation-duration:" + (18 + Math.random() * 16) + "s;animation-delay:-" + (Math.random() * 30) + "s";
+                  box.appendChild(b);
+              }
+          })();
+          setInterval(veAnhSang, 60 * 1000);
+          veAnhSang();
+
+          // ---- Cây lớn theo tiến độ hôm nay ----
+          function capNhatCay(tatCa, pct) {
+              const cay = document.getElementById("cay");
+              if (!cay) return;
+              const lv = (!tatCa || pct === 0) ? 0 : pct <= 25 ? 1 : pct <= 50 ? 2 : pct <= 75 ? 3 : pct < 100 ? 4 : 5;
+              cay.querySelectorAll("[data-g]").forEach(e => e.classList.toggle("on", +e.dataset.g <= lv));
+              const t = cay.querySelector("title");
+              if (t) t.textContent = tatCa ? "Hôm nay xong " + pct + "%" : "Hôm nay chưa có task";
+          }
+
+          // ---- Đồng hồ + Pomodoro ----
+          const POMO_GIAY = { tt: 25 * 60, nghi: 5 * 60 };
+          const TIEU_DE_GOC = document.title;
+          let pomo = { che: "tt", conLai: POMO_GIAY.tt, chay: false, ketThuc: 0 };
+          const hai = n => String(n).padStart(2, "0");
+
+          function pomoTenTask() {
+              const hn = layNgayHomNay();
+              const ds = danhSachData.filter(t => !t.luuTru && !t.hoànThành && toDateKeyFromDeadline(t.deadline) === hn)
+                  .sort((a, b) => String(a.deadline).localeCompare(String(b.deadline)));
+              return ds.length ? ds[0].tenCongViec : "";
+          }
+
+          function pomoVe() {
+              const dem = document.getElementById("pomo-dem");
+              if (!dem) return;
+              const txt = hai(Math.floor(pomo.conLai / 60)) + ":" + hai(pomo.conLai % 60);
+              dem.textContent = txt;
+              document.getElementById("pomo-che-do").textContent = pomo.che === "tt" ? "Tập trung" : "Nghỉ ngơi";
+              document.getElementById("pomo-bt").textContent = pomo.chay ? "⏸ Tạm dừng" : "▶ Bắt đầu";
+              document.title = pomo.chay ? txt + " · " + TIEU_DE_GOC : TIEU_DE_GOC;
+          }
+
+          function pomoBip() {
+              try {
+                  const c = new (window.AudioContext || window.webkitAudioContext)();
+                  const o = c.createOscillator(), g = c.createGain();
+                  o.frequency.value = 880; g.gain.value = 0.15;
+                  o.connect(g); g.connect(c.destination); o.start();
+                  setTimeout(() => { o.stop(); c.close(); }, 600);
+              } catch (e) {}
+          }
+
+          function pomoBatDau() {
+              if (pomo.chay) pomo.conLai = Math.max(0, Math.ceil((pomo.ketThuc - Date.now()) / 1000));
+              else pomo.ketThuc = Date.now() + pomo.conLai * 1000;
+              pomo.chay = !pomo.chay;
+              pomoVe();
+          }
+          function pomoReset() { pomo.chay = false; pomo.conLai = POMO_GIAY[pomo.che]; pomoVe(); }
+          function pomoDoiCheDo() { pomo.che = pomo.che === "tt" ? "nghi" : "tt"; pomoReset(); }
+
+          function pomoTick() {
+              const gio = document.getElementById("pomo-gio");
+              if (!gio) return;
+              const n = new Date();
+              gio.textContent = hai(n.getHours()) + ":" + hai(n.getMinutes());
+              const tenTask = pomoTenTask();
+              const elT = document.getElementById("pomo-task");
+              if (elT.textContent !== tenTask) { elT.textContent = tenTask; elT.title = tenTask; }
+              if (pomo.chay) {
+                  pomo.conLai = Math.ceil((pomo.ketThuc - Date.now()) / 1000);
+                  if (pomo.conLai <= 0) {
+                      const vuaTT = pomo.che === "tt";
+                      pomo.che = vuaTT ? "nghi" : "tt";
+                      pomo.chay = false;
+                      pomo.conLai = POMO_GIAY[pomo.che];
+                      pomoBip();
+                      if ("Notification" in window && Notification.permission === "granted") {
+                          new Notification(vuaTT ? "🍅 Hết giờ tập trung!" : "⏰ Hết giờ nghỉ!", { body: vuaTT ? "Nghỉ 5 phút nhé." : "Sẵn sàng tập trung tiếp." });
+                      }
+                  }
+              }
+              pomoVe();
+          }
+          setInterval(pomoTick, 1000);
+          pomoTick();
+
+          // ---- Polaroid: ảnh nén nhỏ, lưu trong localStorage ----
+          function dungPolaroid(i) {
+              const el = document.getElementById("pol-" + i);
+              if (!el) return;
+              const src = docLocal("polaroid" + i, "");
+              el.innerHTML = "";
+              const anh = document.createElement("div");
+              anh.className = "pol-anh";
+              if (src) anh.style.backgroundImage = 'url("' + src + '")'; else anh.textContent = "+ thêm ảnh";
+              el.appendChild(anh);
+              if (src) {
+                  const x = document.createElement("button");
+                  x.className = "pol-xoa"; x.textContent = "✕"; x.title = "Xoá ảnh";
+                  x.onclick = function(e) { e.stopPropagation(); try { localStorage.removeItem("polaroid" + i); } catch (er) {} dungPolaroid(i); };
+                  el.appendChild(x);
+              }
+              el.onclick = function() {
+                  const inp = document.getElementById("pol-file");
+                  inp.onchange = function() { const f = inp.files[0]; inp.value = ""; if (f) nenAnh(f, i); };
+                  inp.click();
+              };
+          }
+
+          function nenAnh(f, i) {
+              const url = URL.createObjectURL(f), img = new Image();
+              img.onload = function() {
+                  const k = Math.min(1, 360 / Math.max(img.width, img.height));
+                  const c = document.createElement("canvas");
+                  c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+                  c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+                  URL.revokeObjectURL(url);
+                  try { localStorage.setItem("polaroid" + i, JSON.stringify(c.toDataURL("image/jpeg", 0.78))); }
+                  catch (e) { hienModal("Không lưu được ảnh (bộ nhớ trình duyệt đã đầy).", "OK", null, true); return; }
+                  dungPolaroid(i);
+              };
+              img.onerror = function() { URL.revokeObjectURL(url); hienModal("Không đọc được file ảnh này.", "OK", null, true); };
+              img.src = url;
+          }
+          dungPolaroid(1);
+          dungPolaroid(2);
+
           veHeader();
           _init();
+          tuTaoTaskLap();
 
           // Vẽ lại mọi màn hình đang liên quan (dùng khi dữ liệu đổi từ thiết bị khác)
           function capNhatTatCaManHinh() {
@@ -2988,7 +3261,7 @@
                   id:          id,
                   tenCongViec: congViec,
                   hoànThành:   false,
-                  deadline:    layDeadlineTuForm(),
+                  deadline:    layDeadlineTuForm() || (document.getElementById("input-lap").value ? layNgayHomNay() : null),
                   danhSach:    inputDanhSach.value || null,
                   lap:         document.getElementById("input-lap").value || null
               });
