@@ -1,86 +1,13 @@
 <!DOCTYPE html>
-  <html lang="vi">                                                                                                        <head>
-      <meta charset="UTF-8">                                                                                                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&display=swap"
-  rel="stylesheet">
+  <html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
       <title>To-do List</title>
 
-      <!-- Firebase SDK -->
-      <script type="module">
-          import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-          import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-          // =====================================================
-          // ĐỔI config này thành config Firebase project của mày
-          // =====================================================
-          const firebaseConfig = {
-  apiKey: "AIzaSyBRhwGwOl1W5O_y8OCvKtnLZsp2oleOKqI",
-  authDomain: "my-todo-app-ecf5e.firebaseapp.com",
-  databaseURL: "https://my-todo-app-ecf5e-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "my-todo-app-ecf5e",
-  storageBucket: "my-todo-app-ecf5e.firebasestorage.app",
-  messagingSenderId: "198555152410",
-  appId: "1:198555152410:web:2b8c09548e10d8a4b661a3"
-};
-
-          const app = initializeApp(firebaseConfig);
-          const db  = getDatabase(app);
-
-          // Expose để code non-module dùng
-          window._fbRef = ref;
-          window._fbSet = set;
-          window._fbDB  = db;
-
-          // Lắng nghe thay đổi từ cloud → cập nhật local + UI
-          onValue(ref(db, "todos"), (snap) => {
-              let data = snap.val();
-              if (data && Array.isArray(data.tasks)) {
-                  window.danhSachData = data.tasks;
-                  localStorage.setItem("todos", JSON.stringify(data.tasks));
-              }
-              // Luôn re-render sau khi Firebase trả về
-              if (typeof window.veGiaoDien === "function") window.veGiaoDien();
-          });
-
-          onValue(ref(db, "categories"), (snap) => {
-              let data = snap.val();
-              if (data && Array.isArray(data.list) && data.list.length > 0) {
-                  window.danhMucList = data.list;
-                  localStorage.setItem("categories", JSON.stringify(data.list));
-              }
-              // Luôn re-render thanh lọc + select sau khi Firebase trả về
-              // (dù data giống hay khác — đảm bảo UI đúng trên mọi thiết bị)
-              if (typeof window.veThanhLoc === "function") window.veThanhLoc();
-              if (typeof window.capNhatSelectDanhMuc === "function") window.capNhatSelectDanhMuc();
-          });
-
-          // Expose hàm push lên Firebase
-          window.syncToCloud = function() {
-              try {
-                  set(ref(db, "todos"),      { tasks: window.danhSachData });
-                  set(ref(db, "categories"), { list:  window.danhMucList  });
-                  let el = document.getElementById("sync-status");
-                  if (el) { el.textContent = "☁ synced"; el.style.color = "var(--text-muted)"; }
-              } catch(e) {
-                  console.warn("Firebase sync failed:", e);
-                  let el = document.getElementById("sync-status");
-                  if (el) { el.textContent = "⚠ offline"; el.style.color = "#e74c3c"; }
-              }
-          };
-
-          // Hiển thị trạng thái kết nối Firebase
-          onValue(ref(db, ".info/connected"), (snap) => {
-              let el = document.getElementById("sync-status");
-              if (!el) return;
-              if (snap.val() === true) {
-                  el.textContent = "☁ online";
-                  el.style.color = "var(--text-muted)";
-              } else {
-                  el.textContent = "⚠ offline";
-                  el.style.color = "#e74c3c";
-              }
-          });
-      </script>
 
       <style>
           * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1124,6 +1051,57 @@
 
           .btn-modal-ok:hover { background-color: var(--btn-hover); }
 
+
+          /* ===== Theme màu ===== */
+          body[data-theme="matcha"] { --bg-page: #eef2e6; --bg-card: #fbfdf6; --bg-item: #f2f6ea; --border: #dde5cf; --border-input: #c3d0ae; --text-main: #2c3a22; --text-sub: #627a4d; --text-muted: #9aae88; --btn-primary: #6b8e4e; --btn-hover: #4f6f37; --shadow: 0 4px 16px rgba(80,110,60,0.14); }
+          body.dark[data-theme="matcha"] { --bg-page: #151b12; --bg-card: #1d2519; --bg-item: #263020; --border: #35422d; --border-input: #43533a; --text-main: #e4efd8; --text-sub: #98b184; --text-muted: #61744f; --btn-primary: #8fb36d; --btn-hover: #a6c985; --shadow: 0 4px 16px rgba(0,0,0,0.4); }
+          body[data-theme="hong"] { --bg-page: #fbeef0; --bg-card: #fffafa; --bg-item: #fdf1f3; --border: #f3d9de; --border-input: #e8bfc7; --text-main: #4a2a31; --text-sub: #a0606d; --text-muted: #cba0a8; --btn-primary: #d4768a; --btn-hover: #b95a6e; --shadow: 0 4px 16px rgba(212,118,138,0.18); }
+          body.dark[data-theme="hong"] { --bg-page: #1f1316; --bg-card: #291a1e; --bg-item: #342227; --border: #4a2f35; --border-input: #5a3a42; --text-main: #f6dde2; --text-sub: #c89099; --text-muted: #84565f; --btn-primary: #e08fa1; --btn-hover: #eba5b4; --shadow: 0 4px 16px rgba(0,0,0,0.4); }
+          body[data-theme="dem"] { --bg-page: #e8eef7; --bg-card: #f8fbff; --bg-item: #eef3fa; --border: #d3deee; --border-input: #b8c8e0; --text-main: #1f2d44; --text-sub: #5a7194; --text-muted: #94a6c0; --btn-primary: #4a6fa5; --btn-hover: #345489; --shadow: 0 4px 16px rgba(60,90,140,0.15); }
+          body.dark[data-theme="dem"] { --bg-page: #0f1522; --bg-card: #161e2e; --bg-item: #1e283b; --border: #2b374d; --border-input: #38465f; --text-main: #e3ebf8; --text-sub: #8fa5c8; --text-muted: #566580; --btn-primary: #6f95d0; --btn-hover: #88aae0; --shadow: 0 4px 16px rgba(0,0,0,0.4); }
+
+          /* ===== Sổ tay: dòng kẻ + băng dính + tab ===== */
+          .container {
+              position: relative;
+              background-image: repeating-linear-gradient(transparent 0 31px, color-mix(in srgb, var(--btn-primary) 14%, transparent) 31px 32px);
+          }
+          .container::after {
+              content: ""; position: absolute; top: -10px; left: 50%; width: 96px; height: 22px;
+              transform: translateX(-50%) rotate(-2deg); border-radius: 2px; pointer-events: none;
+              background: color-mix(in srgb, var(--btn-primary) 38%, transparent);
+          }
+          .tab { border-radius: 8px 8px 0 0; }
+          .tab.active { background-color: var(--bg-item); }
+          @media (max-width: 480px) { .container::after { top: 4px; } }
+
+          /* ===== Header ===== */
+          .header-sub { text-align: center; margin: -8px 0 16px; font-size: 13px; color: var(--text-sub); }
+          .header-sub .hs-greet { font-weight: 600; color: var(--text-main); }
+          .header-sub .hs-quote { margin-top: 4px; font-size: 12px; font-style: italic; color: var(--text-muted); }
+
+          /* ===== Hiệu ứng ===== */
+          @keyframes popXong {
+              0%   { transform: scale(1); }
+              40%  { transform: scale(1.03); box-shadow: 0 0 0 3px color-mix(in srgb, var(--btn-primary) 35%, transparent); }
+              100% { transform: scale(1); }
+          }
+          li.vua-xong { animation: popXong 0.45s ease; }
+          .confetti { position: fixed; top: -14px; width: 8px; height: 12px; z-index: 10000; pointer-events: none; animation: roiXuong linear forwards; }
+          @keyframes roiXuong { to { transform: translate(var(--dx), 105vh) rotate(var(--r)); } }
+          @media (prefers-reduced-motion: reduce) { li.vua-xong { animation: none; } }
+
+          /* ===== Bước nhỏ ===== */
+          li.co-con { flex-wrap: wrap; }
+          .panel-con { flex: 0 0 100%; width: 100%; margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border); display: flex; flex-direction: column; gap: 4px; }
+          .con-item { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-main); }
+          .con-item span { flex: 1; }
+          .con-item input[type="checkbox"] { accent-color: var(--btn-primary); }
+          .con-item.xong span { text-decoration: line-through; color: var(--text-muted); }
+          .con-item button { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 13px; }
+          .input-row.hang-2 { flex-wrap: wrap; }
+          #input-danh-sach, #input-lap { flex: 1 1 110px; min-width: 0; width: auto; }
+          @media (max-width: 480px) { #input-danh-sach, #input-lap { flex: 0 0 auto; width: 100%; } }
+          input.con-input[type="text"] { padding: 6px 10px; font-size: 14px; border-width: 1px; }
       </style>
   </head>
   <body>
@@ -1131,9 +1109,12 @@
       <div class="container">
           <div class="header">
               <h1>To-do List</h1>
-              <span id="sync-status" title="Trạng thái đồng bộ" style="position:absolute;left:0;font-size:11px;color:var(--text-muted);letter-spacing:0;">⏳ sync...</span>
+              <span id="sync-status" title="Trạng thái đồng bộ" style="position:absolute;left:0;font-size:11px;color:var(--text-muted);letter-spacing:0;">💾 lưu trên máy</span>
               <button class="btn-dark-mode" onclick="batTatDarkMode()" id="btn-dark">🌙</button>
+              <button class="btn-dark-mode" style="right:46px" onclick="doiTheme()" id="btn-theme" title="Đổi màu giao diện">🎨</button>
           </div>
+
+          <div class="header-sub" id="header-sub"></div>
 
           <div class="tabs">
               <div class="tab active" onclick="chuyenTab('danh-sach-tab', this)">Danh sách</div>
@@ -1159,6 +1140,12 @@
                       <select id="input-danh-sach">
                           <option value="">— Danh sách —</option>
                       </select>
+                      <select id="input-lap" title="Lặp lại">
+                          <option value="">Không lặp</option>
+                          <option value="ngay">Hằng ngày</option>
+                          <option value="tuan">Hằng tuần</option>
+                          <option value="t2t6">Thứ 2 → Thứ 6</option>
+                      </select>
                   </div>
               </div>
 
@@ -1178,7 +1165,7 @@
                       <div class="panel-dm-tieu-de">Quản lý danh sách</div>
                       <div id="panel-dm-ds"></div>
                       <div class="panel-dm-them">
-                          <input type="text" id="input-ten-dm" placeholder="Tên danh sách mới..." maxlength="20" onkeydown="if(event.key==='Enter') themDanhMuc()">
+                          <input type="text" id="input-ten-dm" placeholder="Tên danh sách mới..." maxlength="20" onkeydown="if(event.key==='Enter' && !event.isComposing) themDanhMuc()">
                           <button class="btn-them" onclick="themDanhMuc()">Thêm</button>
                       </div>
                   </div>
@@ -1212,6 +1199,9 @@
               <div class="luu-tru-footer" id="luu-tru-footer">
                   <span id="luu-tru-footer-gio" class="luu-tru-footer-gio"></span>
                   <div style="display:flex; gap:8px; align-items:center;">
+                      <button class="btn-luu-tru" onclick="xuatDuLieu()" title="Tải file sao lưu về máy">⬇ Sao lưu</button>
+                      <button class="btn-luu-tru" onclick="nhapDuLieu()" title="Khôi phục từ file sao lưu">⬆ Khôi phục</button>
+                      <input type="file" id="file-nhap" accept=".json,application/json" style="display:none" onchange="docFileNhap(this)">
                       <button class="btn-luu-tru" onclick="copyHomNaySangNgayMai()">⧉ Copy → Ngày mai</button>
                   </div>
               </div>
@@ -1230,6 +1220,15 @@
               </div>
               <div class="lich-grid" id="lich-grid"></div>
               <div class="lich-panel" id="lich-panel"></div>
+
+              <!-- Lưu trữ: xem / khôi phục / xoá vĩnh viễn -->
+              <div class="luu-tru-wrap">
+                  <div class="luu-tru-header" onclick="batTatLuuTru()">
+                      <span id="luu-tru-title">📦 Lưu trữ</span>
+                      <span id="luu-tru-toggle">▸</span>
+                  </div>
+                  <div id="luu-tru-noi-dung" style="display:none"></div>
+              </div>
           </div>
 
       </div>
@@ -1249,13 +1248,48 @@
           const DEFAULT_CATEGORIES = ["Work", "Study", "Health", "Relax"];
 
           // Khởi tạo data — localStorage là cache, Firebase sẽ override khi connect
-          let danhSachData = JSON.parse(localStorage.getItem("todos")) || [];
+          function docLocal(key, macDinh) {
+              try {
+                  let v = JSON.parse(localStorage.getItem(key));
+                  return (v === null || v === undefined) ? macDinh : v;
+              } catch (e) { return macDinh; }   // JSON hỏng thì không làm chết cả app
+          }
+
+          function taoId() {
+              return Date.now() + "_" + Math.random().toString(36).slice(2);
+          }
+
+          // Chuẩn hoá: luôn là mảng, mỗi task có id + tên là chuỗi
+          function chuanHoaTasks(arr) {
+              if (!Array.isArray(arr)) return [];
+              return arr.filter(t => t && typeof t === "object").map(function(t) {
+                  if (!t.id) t.id = taoId();
+                  t.tenCongViec = String(t.tenCongViec == null ? "" : t.tenCongViec);
+                  return t;
+              });
+          }
+
+          // So sánh ổn định: bỏ null, sắp key (Firebase trả key theo thứ tự khác + bỏ null)
+          function chuoiOnDinh(v) {
+              return JSON.stringify(v, function(k, val) {
+                  if (val === null) return undefined;
+                  if (val && typeof val === "object" && !Array.isArray(val)) {
+                      return Object.keys(val).sort().reduce(function(o, key) { o[key] = val[key]; return o; }, {});
+                  }
+                  return val;
+              });
+          }
+
+          // Task vừa thêm (chỉ để chạy animation) — không lưu vào data, không đụng Firebase
+          const idMoi = new Set();
+
+          let danhSachData = chuanHoaTasks(docLocal("todos", []));
           let locHienTai    = "tat-ca";
           let tuKhoaTimKiem = "";
 
           // Đảm bảo DEFAULT_CATEGORIES luôn có trong danhMucList
-          let _savedCats = JSON.parse(localStorage.getItem("categories"));
-          let danhMucList = (_savedCats && _savedCats.length > 0) ? _savedCats : [...DEFAULT_CATEGORIES];
+          let _savedCats = docLocal("categories", null);
+          let danhMucList = (Array.isArray(_savedCats) && _savedCats.length > 0) ? _savedCats : [...DEFAULT_CATEGORIES];
           // Merge: thêm category mặc định nếu user chưa có
           DEFAULT_CATEGORIES.forEach(function(cat) {
               if (!danhMucList.includes(cat)) danhMucList.unshift(cat);
@@ -1264,6 +1298,33 @@
           // Expose lên window để Firebase module script truy cập được
           window.danhSachData = danhSachData;
           window.danhMucList  = danhMucList;
+
+          // ---- Nhận dữ liệu từ Firebase (module script gọi) ----
+          window.nhanTasksTuCloud = function(tasks) {
+              let moi = chuanHoaTasks(tasks);
+              // Echo của chính mình / không có gì khác → bỏ qua, khỏi vẽ lại
+              if (chuoiOnDinh(moi) === chuoiOnDinh(danhSachData)) return;
+              danhSachData = moi;
+              window.danhSachData = danhSachData;
+              try { localStorage.setItem("todos", JSON.stringify(danhSachData)); } catch (e) {}
+              // Đang sửa dở một task thì không vẽ lại để khỏi mất chữ đang gõ
+              if (document.querySelector("#danh-sach .input-sua")) return;
+              capNhatTatCaManHinh();
+          };
+
+          window.nhanDanhMucTuCloud = function(list) {
+              if (list === null) return;   // cloud chưa có → giữ local
+              let moi = Array.isArray(list) ? list.filter(x => typeof x === "string") : [];
+              if (JSON.stringify(moi) === JSON.stringify(danhMucList)) return;
+              danhMucList = moi;
+              window.danhMucList = danhMucList;
+              try { localStorage.setItem("categories", JSON.stringify(danhMucList)); } catch (e) {}
+              if (locHienTai !== "tat-ca" && !danhMucList.includes(locHienTai)) locHienTai = "tat-ca";
+              veThanhLoc();
+              capNhatSelectDanhMuc();
+              if (document.getElementById("panel-danh-muc").style.display !== "none") vePanelDanhMuc();
+              veGiaoDien();
+          };
 
 
           const PHUT_5 = ["00","05","10","15","20","25","30","35","40","45","50","55"];
@@ -1310,16 +1371,12 @@
           })();
 
           function layDeadlineTuForm() {
-              let ngay  = document.getElementById("input-ngay").value;
-              let gio   = document.getElementById("input-gio").value;
-              let phut  = document.getElementById("input-phut").value;
-              let ampm  = document.getElementById("input-ampm").value;
-              if (!ngay) return null;
-              if (!gio && !phut) return ngay;
-              let g = gio || "09";
-              let a = ampm || "AM";
-              let p = phut || "00";
-              return ngay + "T" + h12To24(g, a) + ":" + p;
+              return layDeadlineTuFormSua(
+                  document.getElementById("input-ngay"),
+                  document.getElementById("input-gio"),
+                  document.getElementById("input-phut"),
+                  document.getElementById("input-ampm")
+              );
           }
 
           function datVaoForm(dl) {
@@ -1412,9 +1469,9 @@
           }
 
           function luuDanhMuc() {
-              localStorage.setItem("categories", JSON.stringify(danhMucList));
+              try { localStorage.setItem("categories", JSON.stringify(danhMucList)); } catch (e) {}
               window.danhMucList = danhMucList;
-              if (typeof window.syncToCloud === "function") window.syncToCloud();
+              if (typeof window.syncToCloud === "function") window.syncToCloud("categories");
           }
 
           // ============================================
@@ -1539,7 +1596,9 @@
           // ============================================
           function hienModal(message, labelOk, callback, chiDong) {
               let overlay = document.getElementById("modal-xac-nhan");
-              document.getElementById("modal-msg").innerHTML = message.replace(/\n/g, "<br>");
+              let msgEl = document.getElementById("modal-msg");
+              msgEl.textContent = message;          // textContent: tên task chứa < > không bị hiểu thành HTML
+              msgEl.style.whiteSpace = "pre-line";  // vẫn xuống dòng theo \n
               let btnOk  = document.getElementById("modal-ok");
               let btnHuy = document.getElementById("modal-huy");
               btnOk.textContent = labelOk || "Xóa";
@@ -1589,19 +1648,14 @@
                   let el = document.getElementById("luu-tru-title");
                   if (el) el.textContent = "📦 Lưu trữ" + (soLT > 0 ? " (" + soLT + ")" : "");
                   if (luuTruMoDang) veLuuTru();
+              } else {
+                  veGiaoDien();   // đổi gì bên Lịch thì Danh sách luôn mới
               }
           }
 
           // ============================================
           // LỌC + TÌM KIẾM
           // ============================================
-          function locTheo(gia_tri, nut) {
-              locHienTai = gia_tri;
-              document.querySelectorAll(".btn-loc").forEach(b => b.classList.remove("active"));
-              nut.classList.add("active");
-              veGiaoDien();
-          }
-
           function timKiem() {
               tuKhoaTimKiem = document.getElementById("input-tim-kiem").value.trim().toLowerCase();
               veGiaoDien();
@@ -1620,10 +1674,22 @@
               return ketQua;
           }
 
+          function escapeHtml(str) {
+              return String(str).replace(/[&<>"']/g, function(c) {
+                  return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+              });
+          }
+
           function highlight(text) {
-              if (!tuKhoaTimKiem) return text;
-              let regex = new RegExp("(" + tuKhoaTimKiem.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ")", "gi");
-              return text.replace(regex, '<mark class="highlight">$1</mark>');
+              if (!tuKhoaTimKiem) return escapeHtml(text);
+              let lower = text.toLowerCase(), out = "", i = 0, k = tuKhoaTimKiem.length;
+              while (true) {
+                  let j = lower.indexOf(tuKhoaTimKiem, i);
+                  if (j === -1) break;
+                  out += escapeHtml(text.slice(i, j)) + '<mark class="highlight">' + escapeHtml(text.slice(j, j + k)) + '</mark>';
+                  i = j + k;
+              }
+              return out + escapeHtml(text.slice(i));
           }
 
           // ============================================
@@ -1720,7 +1786,7 @@
                   nhom.appendChild(headerContainer);
                   let ul = document.createElement("ul");
                   nhomTheoNgay[ngay].forEach(function(task) {
-                      ul.appendChild(taoLiElement(task, danhSachData.indexOf(task)));
+                      ul.appendChild(taoLiElement(task));
                   });
                   nhom.appendChild(ul);
                   container.appendChild(nhom);
@@ -1735,7 +1801,7 @@
                   nhom.appendChild(tieuDe);
                   let ul = document.createElement("ul");
                   khongDeadline.forEach(function(task) {
-                      ul.appendChild(taoLiElement(task, danhSachData.indexOf(task)));
+                      ul.appendChild(taoLiElement(task));
                   });
                   nhom.appendChild(ul);
                   container.appendChild(nhom);
@@ -1747,7 +1813,7 @@
           // ============================================
           // TẠO 1 DÒNG TASK
           // ============================================
-          function taoLiElement(item, index) {
+          function taoLiElement(item) {
               let li     = document.createElement("li");
               let homNay = layNgayHomNay();
 
@@ -1758,6 +1824,7 @@
               let noiDung = document.createElement("div");
               noiDung.className = "noi-dung-task";
               if (item.hoànThành) noiDung.classList.add("hoan-thanh");
+              if (item.hoànThành && idVuaXong.has(item.id)) { li.classList.add("vua-xong"); idVuaXong.delete(item.id); }
 
               let tenSpan = document.createElement("span");
               tenSpan.className = "ten-cong-viec";
@@ -1771,7 +1838,7 @@
                       gioSpan.classList.add("qua-han");
                   }
                   gioSpan.textContent = dinhDangGio(item.deadline);
-                  noiDung.appendChild(gioSpan);
+                  if (gioSpan.textContent) noiDung.appendChild(gioSpan);   // deadline chỉ có ngày thì không có giờ
 
                   if (!item.hoànThành) {
                       let demNguoc = tinhDemNguoc(item.deadline);
@@ -1791,10 +1858,20 @@
                   noiDung.appendChild(badge);
               }
 
+              if (item.lap) {
+                  let bl = document.createElement("span"); bl.className = "badge-ds"; bl.textContent = "↻ lặp"; bl.title = "Task lặp lại";
+                  noiDung.appendChild(bl);
+              }
+              if (item.con && item.con.length) {
+                  let bc = document.createElement("span"); bc.className = "badge-ds";
+                  bc.textContent = "☑ " + item.con.filter(c => c.xong).length + "/" + item.con.length;
+                  noiDung.appendChild(bc);
+              }
+
               noiDung.onclick = function() {
                   let idx = danhSachData.findIndex(t => t.id === item.id);
                   if (idx === -1) return;
-                  danhSachData[idx].hoànThành = !danhSachData[idx].hoànThành;
+                  doiTrangThai(danhSachData[idx]);
                   luuDuLieu();
                   veGiaoDien();
               };
@@ -1827,12 +1904,19 @@
               li.appendChild(noiDung);
               li.appendChild(nhomNut);
 
-              ganSuKienKeoTha(li, index);
-              if (item.laMoi) {
+              let nutCon = document.createElement("button");
+              nutCon.textContent = "☑"; nutCon.title = "Các bước nhỏ";
+              nutCon.onclick = function() {
+                  if (idMoRong.has(item.id)) idMoRong.delete(item.id); else idMoRong.add(item.id);
+                  veGiaoDien();
+              };
+              nhomNut.appendChild(nutCon);   // thêm CUỐI để batDauSua vẫn ẩn đúng nút ✎
+              if (idMoRong.has(item.id)) { li.classList.add("co-con"); li.appendChild(taoPanelCon(item)); }
+
+              ganSuKienKeoTha(li, item.id);
+              if (idMoi.has(item.id)) {
                   li.classList.add("them-moi");
-                  // Xóa flag sau khi animation chạy xong
-                  delete danhSachData[index].laMoi;
-                  luuDuLieu();
+                  idMoi.delete(item.id);
               }
               return li;
           }
@@ -1873,6 +1957,11 @@
                khoi.appendChild(inputSua);
                khoi.appendChild(tp.row);
                khoi.appendChild(selectSua);
+               let selectLap = document.createElement("select");
+               selectLap.className = "input-sua";
+               LAP_OPTS.forEach(function(o) { let op = document.createElement("option"); op.value = o[0]; op.textContent = o[1]; selectLap.appendChild(op); });
+               selectLap.value = danhSachData[index].lap || "";
+               khoi.appendChild(selectLap);
 
                let nutLuu = document.createElement("button");
                nutLuu.textContent = "✓";
@@ -1885,22 +1974,23 @@
                        return;
                    }
                    let idx = danhSachData.findIndex(t => t.id === taskId);
-                   if (idx === -1) return;
+                   if (idx === -1) { veGiaoDien(); return; }   // task đã bị xoá từ thiết bị khác
                    danhSachData[idx].tenCongViec = noiDungMoi;
                    danhSachData[idx].deadline    = layDeadlineTuFormSua(tp.ngayEl, tp.gioEl, tp.phutEl, tp.ampmEl);
                    danhSachData[idx].danhSach    = selectSua.value || null;
+                   danhSachData[idx].lap         = selectLap.value || null;
                   luuDuLieu();
                   veGiaoDien();
               }
 
               nutLuu.onclick = luuSua;
               inputSua.onkeydown = function(e) {
-                  if (e.key === "Enter")  luuSua();
+                  if (e.key === "Enter" && !e.isComposing) luuSua();   // isComposing: đang gõ Telex/VNI thì chưa lưu
                   if (e.key === "Escape") veGiaoDien();
               };
 
-              li.insertBefore(khoi, li.lastChild);
-              let nhomNut = li.lastChild;
+              let nhomNut = li.querySelector(".nhom-nut");
+              li.insertBefore(khoi, nhomNut);
               nhomNut.insertBefore(nutLuu, nhomNut.firstChild);
               nhomNut.children[1].style.display = "none";
 
@@ -1912,9 +2002,9 @@
           // KÉO THẢ
           // ============================================
           let idDangKeo = null;
+          let liDangHover = null;
 
-          function ganSuKienKeoTha(li, index) {
-              let idTask = danhSachData[index].id;
+          function ganSuKienKeoTha(li, idTask) {
 
               li.draggable = true;
               li.dataset.id = idTask;
@@ -1926,7 +2016,8 @@
 
               li.ondragover = function(e) {
                   e.preventDefault();
-                  document.querySelectorAll("li").forEach(el => el.classList.remove("vi-tri-tha"));
+                  if (liDangHover && liDangHover !== li) liDangHover.classList.remove("vi-tri-tha");
+                  liDangHover = li;
                   li.classList.add("vi-tri-tha");
               };
 
@@ -1949,6 +2040,7 @@
 
               li.ondragend = function() {
                   idDangKeo = null;
+                  liDangHover = null;
                   document.querySelectorAll("li").forEach(el => {
                       el.classList.remove("dang-keo");
                       el.classList.remove("vi-tri-tha");
@@ -1960,19 +2052,20 @@
           // XÓA HÀNG LOẠT
           // ============================================
           function xoaTatCaHoanThanh() {
-              let so = danhSachData.filter(t => t.hoànThành).length;
+              let so = danhSachData.filter(t => t.hoànThành && !t.luuTru).length;
               if (so === 0) { alert("Không có task nào đã hoàn thành!"); return; }
               hienModal("Xóa " + so + " task đã hoàn thành?", "Xóa", function() {
-                  danhSachData = danhSachData.filter(t => !t.hoànThành);
+                  danhSachData = danhSachData.filter(t => !(t.hoànThành && !t.luuTru));
                   luuDuLieu();
                   veGiaoDien();
               });
           }
 
           function xoaTatCa() {
-              if (danhSachData.length === 0) { alert("Không có task nào!"); return; }
-              hienModal("Xóa toàn bộ " + danhSachData.length + " task? Không thể hoàn tác!", "Xóa tất cả", function() {
-                  danhSachData = [];
+              let dangHien = danhSachData.filter(t => !t.luuTru).length;
+              if (dangHien === 0) { alert("Không có task nào!"); return; }
+              hienModal("Xóa toàn bộ " + dangHien + " task? Không thể hoàn tác!\n(Task trong Lưu trữ được giữ nguyên.)", "Xóa tất cả", function() {
+                  danhSachData = danhSachData.filter(t => t.luuTru);
                   luuDuLieu();
                   veGiaoDien();
               });
@@ -1988,9 +2081,11 @@
               { icon: "📖", title: "Hôm nay chưa có gì!", sub: "Viết xuống để không quên nhé." }
           ];
 
+          const emptyMsgHienTai = emptyMessages[Math.floor(Math.random() * emptyMessages.length)];
+
           function hienEmptyState() {
               let container = document.getElementById("danh-sach");
-              let msg = emptyMessages[Math.floor(Math.random() * emptyMessages.length)];
+              let msg = emptyMsgHienTai;
               container.innerHTML = `
                   <div class="empty-state">
                       <div class="empty-icon">${msg.icon}</div>
@@ -2004,11 +2099,15 @@
           // PROGRESS BAR + ĐẾM
           // ============================================
           function capNhatDem() {
-              let daDuocLoc = layDanhSachDaLoc();
+              // Thanh tiến độ chỉ tính task có deadline là HÔM NAY (copy sang ngày mai không làm nó nhảy)
+              let homNay    = layNgayHomNay();
+              let daDuocLoc = layDanhSachDaLoc().filter(t => toDateKeyFromDeadline(t.deadline) === homNay);
               let tatCa     = daDuocLoc.length;
               let hoànThành = daDuocLoc.filter(item => item.hoànThành).length;
               let chuaXong  = tatCa - hoànThành;
               let phanTram  = tatCa === 0 ? 0 : Math.round((hoànThành / tatCa) * 100);
+              if (phanTram === 100 && tatCa > 0 && tatCaTruoc === tatCa && phanTramTruoc !== null && phanTramTruoc < 100) confetti();
+              tatCaTruoc = tatCa; phanTramTruoc = phanTram;
 
               let progressWrap = document.getElementById("progress-wrap");
               let dem          = document.getElementById("dem");
@@ -2020,8 +2119,8 @@
               } else {
                   progressWrap.style.display = "block";
                   dem.textContent = chuaXong === 0
-                      ? "Hoàn thành tất cả " + tatCa + " task! 🎉"
-                      : hoànThành + "/" + tatCa + " task hoàn thành";
+                      ? "Hoàn thành tất cả " + tatCa + " task hôm nay! 🎉"
+                      : hoànThành + "/" + tatCa + " task hôm nay hoàn thành";
                   phanTramEl.textContent = phanTram + "%";
                   bar.style.width = phanTram + "%";
                   phanTram === 100
@@ -2034,6 +2133,7 @@
           // ĐẾM NGƯỢC DEADLINE
           // ============================================
           function tinhDemNguoc(deadline) {
+              if (!deadline || deadline.indexOf("T") === -1) return null;   // chỉ có ngày → không có giờ để đếm
               let bayGio    = new Date();
               let hetHan    = new Date(deadline);
               let conLaiMs  = hetHan - bayGio;
@@ -2074,8 +2174,7 @@
               thangHienTai = new Date().getMonth();
               namHienTai   = new Date().getFullYear();
               ngayDangChon = layNgayHomNay();
-              veLich();
-              hienTaskCuaNgay(ngayDangChon);
+              veLich();   // veLich đã tự hiện task của ngày đang chọn
           }
 
           function veLich() {
@@ -2101,7 +2200,7 @@
 
               let taskTheoNgay = {};
               danhSachData.forEach(function(task) {
-                  if (!task.deadline) return;
+                  if (!task.deadline || task.luuTru) return;   // task đã lưu trữ không hiện trên lịch
                   let ngay = task.deadline.split("T")[0];
                   if (!taskTheoNgay[ngay]) taskTheoNgay[ngay] = [];
                   taskTheoNgay[ngay].push(task);
@@ -2145,7 +2244,6 @@
                   o.onclick = function() {
                       ngayDangChon = ngayDay;
                       veLich();
-                      hienTaskCuaNgay(ngayDay);
                   };
 
                   grid.appendChild(o);
@@ -2161,6 +2259,7 @@
               }
 
               if (ngayDangChon) hienTaskCuaNgay(ngayDangChon);
+              capNhatTieuDeLuuTru();
           }
 
           function hienTaskCuaNgay(ngayDay) {
@@ -2170,7 +2269,7 @@
               let [nam, thang, ngay] = ngayDay.split("-");
 
               let taskHom = danhSachData.filter(function(task) {
-                  return task.deadline && task.deadline.split("T")[0] === ngayDay;
+                  return !task.luuTru && task.deadline && task.deadline.split("T")[0] === ngayDay;
               });
 
               // Header: tiêu đề + nút xóa tất cả
@@ -2218,7 +2317,7 @@
 
                   let gio = document.createElement("span");
                   gio.className = "lich-task-gio";
-                  gio.textContent = dinhDangGio(task.deadline);
+                  gio.textContent = dinhDangGio(task.deadline) || "Cả ngày";
 
                   let ten = document.createElement("span");
                   ten.className = "lich-task-ten";
@@ -2230,8 +2329,9 @@
                   clickArea.appendChild(gio);
                   clickArea.appendChild(ten);
                   clickArea.onclick = function() {
-                      let index = danhSachData.indexOf(task);
-                      danhSachData[index].hoànThành = !danhSachData[index].hoànThành;
+                      let t = danhSachData.find(x => x.id === task.id);
+                      if (!t) return;
+                      doiTrangThai(t);
                       luuDuLieu();
                       veLich();
                   };
@@ -2268,17 +2368,27 @@
           // ============================================
           // NHẮC DEADLINE TRƯỚC 15 PHÚT
           // ============================================
+          // Xin quyền ở lần chạm đầu tiên (iOS Safari bắt buộc có thao tác người dùng)
           if ("Notification" in window && Notification.permission === "default") {
-              Notification.requestPermission();
+              document.addEventListener("click", function() {
+                  try { Notification.requestPermission(); } catch (e) {}
+              }, { once: true });
           }
 
-          let daNhac = JSON.parse(localStorage.getItem("daNhac")) || {};
+          let daNhac = docLocal("daNhac", {});
 
           function kiemTraDeadline() {
-              if (Notification.permission !== "granted") return;
+              if (!("Notification" in window) || Notification.permission !== "granted") return;
               let bayGio = new Date();
+
+              // Dọn các mốc đã nhắc của task không còn tồn tại (khỏi phình localStorage)
+              let hopLe = {};
+              danhSachData.forEach(function(t) { if (t.deadline) hopLe[t.deadline + t.tenCongViec] = true; });
+              let doi = false;
+              Object.keys(daNhac).forEach(function(k) { if (!hopLe[k]) { delete daNhac[k]; doi = true; } });
+
               danhSachData.forEach(function(task) {
-                  if (!task.deadline || task.hoànThành) return;
+                  if (!task.deadline || task.deadline.indexOf("T") === -1 || task.hoànThành) return;
                   let hetHan  = new Date(task.deadline);
                   let conLai  = (hetHan - bayGio) / 1000 / 60;
                   let key     = task.deadline + task.tenCongViec;
@@ -2287,13 +2397,21 @@
                           body: "\"" + task.tenCongViec + "\" còn 15 phút nữa!"
                       });
                       daNhac[key] = true;
-                      localStorage.setItem("daNhac", JSON.stringify(daNhac));
+                      doi = true;
                   }
               });
+              if (doi) { try { localStorage.setItem("daNhac", JSON.stringify(daNhac)); } catch (e) {} }
           }
 
           setInterval(kiemTraDeadline, 60 * 1000);
           kiemTraDeadline();
+
+          // Làm mới đếm ngược / mốc "Hôm nay" mỗi phút (không làm khi đang sửa, đang kéo hoặc tab ẩn)
+          setInterval(function() {
+              if (document.hidden || idDangKeo) return;
+              if (document.querySelector("#danh-sach .input-sua")) return;
+              if (document.getElementById("danh-sach-tab").classList.contains("active")) veGiaoDien();
+          }, 60 * 1000);
 
           // ============================================
           // LƯU TRỮ TẤT CẢ
@@ -2526,6 +2644,7 @@
                           }
                           luuDuLieu();
                           veGiaoDien();
+                          veLich();
                           veLuuTru();
                       };
 
@@ -2556,31 +2675,207 @@
           // KHỞI TẠO UI + EXPOSE LÊN WINDOW CHO FIREBASE
           // ============================================
           function _init() {
-              // Wrap veGiaoDien để auto-sync window vars trước khi vẽ
-              let _origVGD = veGiaoDien;
-              veGiaoDien = function() {
-                  if (window.danhSachData !== danhSachData) danhSachData = window.danhSachData;
-                  if (window.danhMucList  !== danhMucList)  danhMucList  = window.danhMucList;
-                  _origVGD();
-              };
-
-              let _origVTL = veThanhLoc;
-              veThanhLoc = function() {
-                  if (window.danhMucList !== danhMucList) danhMucList = window.danhMucList;
-                  _origVTL();
-              };
-
-              // Expose lên window để Firebase module script gọi được
-              window.veGiaoDien           = veGiaoDien;
-              window.veThanhLoc           = veThanhLoc;
-              window.capNhatSelectDanhMuc = capNhatSelectDanhMuc;
-
-              // Khởi tạo UI lần đầu
               veGiaoDien();
               veThanhLoc();
               capNhatSelectDanhMuc();
           }
+
+          // ============================================
+          // TÍNH NĂNG MỚI: lặp lại, bước nhỏ, theme, header, hiệu ứng
+          // ============================================
+          const idVuaXong = new Set();   // task vừa tick xong (chỉ để chạy animation)
+          const idMoRong  = new Set();   // task đang mở panel bước nhỏ
+          let phanTramTruoc = null, tatCaTruoc = null;
+          const LAP_OPTS = [["", "Không lặp"], ["ngay", "Hằng ngày"], ["tuan", "Hằng tuần"], ["t2t6", "Thứ 2 → Thứ 6"]];
+
+          function khoaNgay(dt) {
+              return dt.getFullYear() + "-" + String(dt.getMonth() + 1).padStart(2, "0") + "-" + String(dt.getDate()).padStart(2, "0");
+          }
+
+          // Ngày kế tiếp của task lặp: luôn sau cả deadline cũ lẫn hôm nay (làm trễ thì không đẻ ra task quá hạn)
+          function ngayLapTiep(dateKey, lap) {
+              const [y, m, d] = dateKey.split("-").map(Number);
+              const dt = new Date(y, m - 1, d);
+              const hn = layNgayHomNay();
+              const moc = dateKey > hn ? dateKey : hn;
+              do {
+                  dt.setDate(dt.getDate() + (lap === "tuan" ? 7 : 1));
+                  if (lap === "t2t6") while (dt.getDay() === 0 || dt.getDay() === 6) dt.setDate(dt.getDate() + 1);
+              } while (khoaNgay(dt) <= moc);
+              return khoaNgay(dt);
+          }
+
+          function copyCon(t) {
+              if (!t.con || !t.con.length) return undefined;
+              return t.con.map(c => ({ id: taoId(), ten: c.ten, xong: false }));
+          }
+
+          // Đổi trạng thái xong/chưa; xong một task lặp lại → tự tạo task kỳ sau (có chống trùng)
+          function doiTrangThai(t) {
+              t.hoànThành = !t.hoànThành;
+              if (!t.hoànThành) return;
+              idVuaXong.add(t.id);
+              if (!t.lap) return;
+              const next = ngayLapTiep(toDateKeyFromDeadline(t.deadline) || layNgayHomNay(), t.lap);
+              const trung = danhSachData.some(x => x.id !== t.id && x.tenCongViec === t.tenCongViec &&
+                  (x.danhSach || "") === (t.danhSach || "") && toDateKeyFromDeadline(x.deadline) === next);
+              if (trung) return;
+              const time = t.deadline && t.deadline.split("T")[1];
+              const id = taoId();
+              idMoi.add(id);
+              danhSachData.push({ id: id, tenCongViec: t.tenCongViec, hoànThành: false,
+                  deadline: time ? next + "T" + time : next, danhSach: t.danhSach || null, lap: t.lap, con: copyCon(t) });
+          }
+
+          // ---- Bước nhỏ (checklist) ----
+          function luuSauSuaCon(id, fn) {
+              const t = danhSachData.find(x => x.id === id);
+              if (!t) return;
+              fn(t);
+              const ds = t.con || [];
+              const xongHet = ds.length > 0 && ds.every(c => c.xong);
+              if (xongHet && !t.hoànThành) doiTrangThai(t);                 // tick hết → task tự xong
+              else if (!xongHet && t.hoànThành && ds.length) t.hoànThành = false;
+              luuDuLieu();
+              veGiaoDien();
+          }
+
+          function taoPanelCon(item) {
+              const box = document.createElement("div");
+              box.className = "panel-con";
+              (item.con || []).forEach(function(c) {
+                  const row = document.createElement("div");
+                  row.className = "con-item" + (c.xong ? " xong" : "");
+                  const cb = document.createElement("input");
+                  cb.type = "checkbox"; cb.checked = !!c.xong;
+                  cb.onchange = () => luuSauSuaCon(item.id, t => { const x = t.con.find(y => y.id === c.id); if (x) x.xong = cb.checked; });
+                  const ten = document.createElement("span");
+                  ten.textContent = c.ten;
+                  const xoa = document.createElement("button");
+                  xoa.textContent = "✕"; xoa.title = "Xoá bước";
+                  xoa.onclick = () => luuSauSuaCon(item.id, t => { t.con = t.con.filter(y => y.id !== c.id); });
+                  row.append(cb, ten, xoa);
+                  box.appendChild(row);
+              });
+              const inp = document.createElement("input");
+              inp.type = "text"; inp.className = "con-input"; inp.placeholder = "Thêm bước nhỏ...";
+              inp.onkeydown = function(e) {
+                  if (e.key !== "Enter" || e.isComposing) return;
+                  const v = inp.value.trim();
+                  if (!v) return;
+                  luuSauSuaCon(item.id, t => { (t.con = t.con || []).push({ id: taoId(), ten: v, xong: false }); });
+                  const again = document.querySelector('li[data-id="' + item.id + '"] .con-input');
+                  if (again) again.focus();
+              };
+              box.appendChild(inp);
+              return box;
+          }
+
+          // ---- Theme màu (bấm 🎨 để đổi vòng: nâu kem → matcha → hồng → xanh đêm) ----
+          const THEMES = ["", "matcha", "hong", "dem"];
+          function datTheme(t) {
+              if (!THEMES.includes(t)) t = "";
+              if (t) document.body.dataset.theme = t; else delete document.body.dataset.theme;
+              try { localStorage.setItem("theme", JSON.stringify(t)); } catch (e) {}
+          }
+          function doiTheme() {
+              datTheme(THEMES[(THEMES.indexOf(document.body.dataset.theme || "") + 1) % THEMES.length]);
+          }
+          datTheme(docLocal("theme", ""));
+
+          // ---- Header: lời chào + ngày + câu trích ----
+          function veHeader() {
+              const el = document.getElementById("header-sub");
+              if (!el) return;
+              const QUOTES = [
+                  "Mỗi ngày xong một việc nhỏ, cuối tuần sẽ thấy một bước dài.",
+                  "Bắt đầu trước, hoàn hảo tính sau.",
+                  "Việc khó nhất thường chỉ là việc đầu tiên.",
+                  "Làm đều tay thắng làm dồn một lúc.",
+                  "Một danh sách ngắn mà xong còn hơn danh sách dài mà dở.",
+                  "Nghỉ đúng lúc cũng là một phần của làm việc.",
+                  "Hôm nay xong một việc quan trọng là đã đủ đẹp.",
+                  "Kỷ luật là món quà gửi cho chính mình của ngày mai."
+              ];
+              const n = new Date(), h = n.getHours();
+              const chao = h < 11 ? "Chào buổi sáng" : h < 14 ? "Chào buổi trưa" : h < 18 ? "Chào buổi chiều" : "Chào buổi tối";
+              const thu = ["Chủ nhật", "Thứ hai", "Thứ ba", "Thứ tư", "Thứ năm", "Thứ sáu", "Thứ bảy"][n.getDay()];
+              const ngayTrongNam = Math.floor((n - new Date(n.getFullYear(), 0, 0)) / 864e5);
+              el.innerHTML = '<div><span class="hs-greet">' + chao + '</span> · ' + thu + ', ' + dinhDangNgay(layNgayHomNay()) + '/' + n.getFullYear() +
+                             '</div><div class="hs-quote">“' + QUOTES[ngayTrongNam % QUOTES.length] + '”</div>';
+          }
+          setInterval(veHeader, 60 * 1000);
+
+          // ---- Confetti khi xong hết task hôm nay ----
+          function confetti() {
+              if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+              const mau = ["#e74c3c", "#f1c40f", "#2ecc71", "#3498db", "#9b59b6", "#e67e22"];
+              for (let i = 0; i < 40; i++) {
+                  const p = document.createElement("i");
+                  p.className = "confetti";
+                  p.style.cssText = "left:" + (Math.random() * 100) + "vw;background:" + mau[i % mau.length] +
+                      ";--dx:" + (Math.random() * 160 - 80) + "px;--r:" + (Math.random() * 720) + "deg;" +
+                      "animation-delay:" + (Math.random() * 0.3) + "s;animation-duration:" + (1.6 + Math.random() * 1.2) + "s";
+                  document.body.appendChild(p);
+                  setTimeout(() => p.remove(), 3500);
+              }
+          }
+
+          // ---- Sao lưu / khôi phục bằng file JSON ----
+          function xuatDuLieu() {
+              const data = { phienBan: 1, xuatLuc: new Date().toISOString(), tasks: danhSachData, categories: danhMucList };
+              const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = "todo-backup-" + layNgayHomNay() + ".json";
+              document.body.appendChild(a);
+              a.click();
+              a.remove();
+              setTimeout(() => URL.revokeObjectURL(url), 1000);
+          }
+
+          function nhapDuLieu() { document.getElementById("file-nhap").click(); }
+
+          function docFileNhap(input) {
+              const f = input.files[0];
+              input.value = "";
+              if (!f) return;
+              const r = new FileReader();
+              r.onload = function() {
+                  let d;
+                  try { d = JSON.parse(r.result); } catch (e) { hienModal("File không đọc được (không phải JSON hợp lệ).", "OK", null, true); return; }
+                  if (!d || !Array.isArray(d.tasks)) { hienModal("File này không phải bản sao lưu của app.", "OK", null, true); return; }
+                  hienModal("Khôi phục " + d.tasks.length + " task từ file?\nDữ liệu hiện tại sẽ bị thay thế.", "Khôi phục", function() {
+                      danhSachData = chuanHoaTasks(d.tasks);
+                      if (Array.isArray(d.categories)) {
+                          danhMucList = d.categories.filter(x => typeof x === "string");
+                          luuDanhMuc();
+                          capNhatSelectDanhMuc();
+                          veThanhLoc();
+                      }
+                      luuDuLieu();
+                      capNhatTatCaManHinh();
+                  });
+              };
+              r.readAsText(f);
+          }
+
+          veHeader();
           _init();
+
+          // Vẽ lại mọi màn hình đang liên quan (dùng khi dữ liệu đổi từ thiết bị khác)
+          function capNhatTatCaManHinh() {
+              veGiaoDien();
+              if (document.getElementById("lich-tab").classList.contains("active")) veLich();
+              if (luuTruMoDang) veLuuTru();
+          }
+
+          function capNhatTieuDeLuuTru() {
+              let el = document.getElementById("luu-tru-title");
+              if (!el) return;
+              let so = danhSachData.filter(t => t.luuTru).length;
+              el.textContent = "📦 Lưu trữ" + (so > 0 ? " (" + so + ")" : "");
+          }
 
           // ============================================
           // HÀM TIỆN ÍCH
@@ -2599,20 +2894,22 @@
           }
 
           function dinhDangGio(chuoiDatetime) {
-              let [ngay, gio] = chuoiDatetime.split("T");
+              // Deadline có thể chỉ có ngày ("YYYY-MM-DD") → không có giờ
+              if (!chuoiDatetime || chuoiDatetime.indexOf("T") === -1) return "";
+              let gio = chuoiDatetime.split("T")[1];
               let [h, m] = gio.split(":");
               let c = h24To12(h);
               return c.h12 + ":" + m + " " + c.ampm;
           }
 
           function luuDuLieu() {
-              localStorage.setItem("todos", JSON.stringify(danhSachData));
+              try { localStorage.setItem("todos", JSON.stringify(danhSachData)); } catch (e) {}
               window.danhSachData = danhSachData;
-              if (typeof window.syncToCloud === "function") window.syncToCloud();
+              if (typeof window.syncToCloud === "function") window.syncToCloud("todos");
           }
 
           function nhimEnter(event) {
-              if (event.key === "Enter") themCongViec();
+              if (event.key === "Enter" && !event.isComposing) themCongViec();   // isComposing: đang gõ Telex/VNI
           }
 
           function toDateKeyFromDeadline(deadline) {
@@ -2640,63 +2937,71 @@
                   return;
               }
 
-              let added = 0;
+              // Task đã có sẵn ở ngày mai (cùng tên + cùng danh sách) thì bỏ qua → bấm nhiều lần không bị nhân đôi
+              const khoaTask = t => t.tenCongViec + "|" + (t.danhSach || "");
+              const daCo = new Set(
+                  danhSachData.filter(t => !t.luuTru && toDateKeyFromDeadline(t.deadline) === tomorrow).map(khoaTask)
+              );
 
+              let added = 0, skipped = 0;
               todays.forEach(t => {
-                  let newDeadline = null;
-                  if (t.deadline) {
-                       const parts = String(t.deadline).split("T");
-                       const time = parts[1] || "09:00";
-                       newDeadline = tomorrow + "T" + time;
-                   } else {
-                       newDeadline = tomorrow + "T09:00";
-                   }
+                  const khoa = khoaTask(t);
+                  if (daCo.has(khoa)) { skipped++; return; }
+                  daCo.add(khoa);
 
+                  const time = String(t.deadline).split("T")[1];   // undefined nếu task chỉ có ngày
+                  const id = taoId();
+                  idMoi.add(id);
                   danhSachData.push({
-                      id:         Date.now() + "_" + Math.random().toString(36).slice(2),
+                      id:          id,
                       tenCongViec: t.tenCongViec,
-                      hoànThành:  false,
-                      deadline:   newDeadline,
-                      danhSach:   t.danhSach || null,
-                      laMoi:      true
+                      hoànThành:   false,
+                      deadline:    time ? tomorrow + "T" + time : tomorrow,
+                      con:         copyCon(t),
+                      danhSach:    t.danhSach || null
                   });
                   added++;
               });
 
-              luuDuLieu();
-              veGiaoDien();
-              hienModal("Đã copy toàn bộ " + added + " task từ hôm nay sang ngày mai.", "OK", null, true);
+              if (added) {
+                  luuDuLieu();
+                  veGiaoDien();
+              }
+              let msg = "Đã copy " + added + " task từ hôm nay sang ngày mai.";
+              if (skipped) msg += "\n" + skipped + " task đã có sẵn ở ngày mai nên được bỏ qua.";
+              hienModal(msg, "OK", null, true);
           }
 
+          function themCongViec() {
+              let input         = document.getElementById("input-cong-viec");
+              let inputDanhSach = document.getElementById("input-danh-sach");
+              let congViec      = input.value.trim();
 
+              if (congViec === "") {
+                  alert("Bạn chưa nhập công việc!");
+                  return;
+              }
 
-           function themCongViec() {
-               let input         = document.getElementById("input-cong-viec");
-               let inputDanhSach = document.getElementById("input-danh-sach");
-               let congViec      = input.value.trim();
+              let id = taoId();
+              idMoi.add(id);
+              danhSachData.push({
+                  id:          id,
+                  tenCongViec: congViec,
+                  hoànThành:   false,
+                  deadline:    layDeadlineTuForm(),
+                  danhSach:    inputDanhSach.value || null,
+                  lap:         document.getElementById("input-lap").value || null
+              });
 
-               if (congViec === "") {
-                   alert("Bạn chưa nhập công việc!");
-                   return;
-               }
+              luuDuLieu();
+              veGiaoDien();
 
-                danhSachData.push({
-                   id:         Date.now() + "_" + Math.random().toString(36).slice(2),
-                   tenCongViec: congViec,
-                   hoànThành:  false,
-                    deadline:   layDeadlineTuForm(),
-                   danhSach:   inputDanhSach.value || null,
-                   laMoi:      true
-               });
-
-               luuDuLieu();
-               veGiaoDien();
-
-               input.value = "";
-               datVaoForm(null);
-               inputDanhSach.value = "";
-               input.focus();
-           }
+              input.value = "";
+              datVaoForm(null);
+              inputDanhSach.value = "";
+              document.getElementById("input-lap").value = "";
+              input.focus();
+          }
 
       </script>
 
