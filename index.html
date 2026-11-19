@@ -55,7 +55,7 @@
               padding: 30px;
               border-radius: 12px;
               width: 100%;
-              max-width: 700px;
+              max-width: 860px;
               box-shadow: var(--shadow);
               transition: background-color 0.3s;
           }
@@ -1098,9 +1098,6 @@
           .con-item input[type="checkbox"] { accent-color: var(--btn-primary); }
           .con-item.xong span { text-decoration: line-through; color: var(--text-muted); }
           .con-item button { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 13px; }
-          .input-row.hang-2 { flex-wrap: wrap; }
-          #input-danh-sach, #input-lap { flex: 1 1 110px; min-width: 0; width: auto; }
-          @media (max-width: 480px) { #input-danh-sach, #input-lap { flex: 0 0 auto; width: 100%; } }
           input.con-input[type="text"] { padding: 6px 10px; font-size: 14px; border-width: 1px; }
 
           /* ===== Mặt bàn làm việc (nền + ánh sáng + đồ vật hai bên) ===== */
@@ -1124,10 +1121,10 @@
           .bui { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: rgba(255,236,190,0.85); animation: troiBui linear infinite; }
           @keyframes troiBui { 0% { transform: translate(0,0); opacity: 0; } 20%,80% { opacity: 0.7; } 100% { transform: translate(40px,-60px); opacity: 0; } }
 
-          .desk-side { position: absolute; top: 0; bottom: 0; width: calc((100vw - 800px) / 2); display: none;
+          .desk-side { position: absolute; top: 0; bottom: 0; width: calc((100vw - 960px) / 2); display: none;
                        flex-direction: column; align-items: center; justify-content: space-evenly; padding: 8vh 0; }
           .desk-left { left: 0; } .desk-right { right: 0; }
-          @media (min-width: 1200px) { .desk-side { display: flex; } }
+          @media (min-width: 1360px) { .desk-side { display: flex; } }
           .deco { color: var(--btn-primary); opacity: 0.55; width: clamp(90px, 9vw, 170px); height: auto; }
           .deco-pencil { transform: rotate(-24deg); width: clamp(110px, 11vw, 200px); }
           .deco-clip { transform: rotate(18deg); width: clamp(26px, 2.4vw, 40px); }
@@ -1169,6 +1166,15 @@
           .deco-plant .pb { fill: color-mix(in srgb, currentColor 62%, #fff); }
           .deco-plant .pc { fill: color-mix(in srgb, currentColor 78%, #000); }
           .deco-plant .pd { fill: color-mix(in srgb, currentColor 70%, #fff); }
+          /* ===== Form ngày / giờ: lưới 2 cột, mọi ô lấp đầy chiều ngang, không dính nhau ===== */
+          .input-row.hang-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+          .input-row.hang-2 > input[type="date"] { grid-column: 1 / -1; }
+          .input-row.hang-2 > select { width: 100%; min-width: 0; }
+          .thoi-gian-row { align-items: center; gap: 6px; min-width: 0; }
+          .thoi-gian-row select { flex: 1 1 0; width: auto; min-width: 0; padding-left: 10px; padding-right: 22px; }
+          .thoi-gian-row select.sel-ampm { flex: 0 0 74px; min-width: 0; }
+          .nhan-gio { flex: 0 0 58px; font-size: 12px; color: var(--text-muted); }
+          @media (max-width: 480px) { .input-row.hang-2 { grid-template-columns: 1fr; } }
       </style>
   </head>
   <body>
@@ -1244,6 +1250,13 @@
                   <div class="input-row hang-2">
                       <input type="date" id="input-ngay">
                       <div class="thoi-gian-row" style="flex:1;">
+                          <span class="nhan-gio">Bắt đầu</span>
+                          <select id="input-bd-gio"></select>
+                          <select id="input-bd-phut"></select>
+                          <select id="input-bd-ampm" class="sel-ampm"></select>
+                      </div>
+                      <div class="thoi-gian-row" style="flex:1;">
+                          <span class="nhan-gio">Kết thúc</span>
                           <select id="input-gio"></select>
                           <select id="input-phut"></select>
                           <select id="input-ampm" class="sel-ampm"></select>
@@ -1481,6 +1494,56 @@
               });
           })();
 
+          // ---- Giờ bắt đầu (batDau = "HH:mm", cùng ngày với deadline) ----
+          (function() {
+              ["gio", "phut", "ampm"].forEach(function(k) {
+                  document.getElementById("input-bd-" + k).innerHTML = document.getElementById("input-" + k).innerHTML;
+              });
+          })();
+
+          function layGioTuSelect(gioEl, phutEl, ampmEl) {
+              if (!gioEl.value && !phutEl.value) return null;
+              return h12To24(gioEl.value || "09", ampmEl.value || "AM") + ":" + (phutEl.value || "00");
+          }
+
+          function datGioVaoSelect(gioEl, phutEl, ampmEl, hhmm) {
+              if (!hhmm) { gioEl.value = ""; phutEl.value = ""; ampmEl.value = ""; return; }
+              let [h, m] = hhmm.split(":");
+              let c = h24To12(h);
+              gioEl.value = c.h12; ampmEl.value = c.ampm;
+              let sn = String(Math.round(parseInt(m, 10) / 5) * 5).padStart(2, "0");
+              phutEl.value = sn === "60" ? "55" : sn;
+          }
+
+          function loiBatDau(dl, bd) {
+              if (!bd) return "";
+              if (!dl || dl.indexOf("T") === -1) return "Cần chọn ngày và giờ kết thúc trước khi đặt giờ bắt đầu.";
+              if (bd >= dl.split("T")[1]) return "Giờ bắt đầu phải sớm hơn giờ kết thúc.";
+              return "";
+          }
+
+          function dinhDangHHmm(hhmm) {
+              let [h, m] = hhmm.split(":");
+              let c = h24To12(h);
+              return c.h12 + ":" + m + " " + c.ampm;
+          }
+
+          function taoHangBatDau() {
+              let row = document.createElement("div");
+              row.className = "thoi-gian-row";
+              let nhan = document.createElement("span");
+              nhan.className = "nhan-gio"; nhan.textContent = "Bắt đầu";
+              function mk(id, cls) {
+                  let el = document.createElement("select");
+                  el.className = "input-sua " + cls;
+                  el.innerHTML = document.getElementById(id).innerHTML;
+                  return el;
+              }
+              let gioEl = mk("input-bd-gio", ""), phutEl = mk("input-bd-phut", ""), ampmEl = mk("input-bd-ampm", "sel-ampm");
+              row.append(nhan, gioEl, phutEl, ampmEl);
+              return { row, gioEl, phutEl, ampmEl };
+          }
+
           function layDeadlineTuForm() {
               return layDeadlineTuFormSua(
                   document.getElementById("input-ngay"),
@@ -1495,7 +1558,11 @@
               let gio   = document.getElementById("input-gio");
               let phut  = document.getElementById("input-phut");
               let ampm  = document.getElementById("input-ampm");
-              if (!dl) { ngay.value = ""; gio.value = ""; phut.value = ""; ampm.value = ""; return; }
+              if (!dl) {
+                  ngay.value = ""; gio.value = ""; phut.value = ""; ampm.value = "";
+                  datGioVaoSelect(document.getElementById("input-bd-gio"), document.getElementById("input-bd-phut"), document.getElementById("input-bd-ampm"), null);
+                  return;
+              }
               let [d, t] = dl.split("T");
               ngay.value = d;
               if (t) {
@@ -1948,7 +2015,7 @@
                   if (item.deadline.split("T")[0] < homNay && !item.hoànThành) {
                       gioSpan.classList.add("qua-han");
                   }
-                  gioSpan.textContent = dinhDangGio(item.deadline);
+                  gioSpan.textContent = (item.batDau && item.deadline.indexOf("T") !== -1 ? dinhDangHHmm(item.batDau) + " → " : "") + dinhDangGio(item.deadline);
                   if (gioSpan.textContent) noiDung.appendChild(gioSpan);   // deadline chỉ có ngày thì không có giờ
 
                   if (!item.hoànThành) {
@@ -2052,6 +2119,11 @@
                inputSua.value = danhSachData[index].tenCongViec;
 
                let tp = taoHangGioPhut();
+               let nhanKt = document.createElement("span");
+               nhanKt.className = "nhan-gio"; nhanKt.textContent = "Kết thúc";
+               tp.row.insertBefore(nhanKt, tp.gioEl);
+               let bd = taoHangBatDau();
+               datGioVaoSelect(bd.gioEl, bd.phutEl, bd.ampmEl, danhSachData[index].batDau);
                datGioPhut(tp.ngayEl, tp.gioEl, tp.phutEl, tp.ampmEl, danhSachData[index].deadline);
 
                let selectSua = document.createElement("select");
@@ -2066,6 +2138,7 @@
                selectSua.value = danhSachData[index].danhSach || "";
 
                khoi.appendChild(inputSua);
+               khoi.appendChild(bd.row);
                khoi.appendChild(tp.row);
                khoi.appendChild(selectSua);
                let selectLap = document.createElement("select");
@@ -2086,8 +2159,13 @@
                    }
                    let idx = danhSachData.findIndex(t => t.id === taskId);
                    if (idx === -1) { veGiaoDien(); return; }   // task đã bị xoá từ thiết bị khác
+                   let dl  = layDeadlineTuFormSua(tp.ngayEl, tp.gioEl, tp.phutEl, tp.ampmEl);
+                   let bdv = layGioTuSelect(bd.gioEl, bd.phutEl, bd.ampmEl);
+                   let loi = loiBatDau(dl, bdv);
+                   if (loi) { alert(loi); return; }
                    danhSachData[idx].tenCongViec = noiDungMoi;
-                   danhSachData[idx].deadline    = layDeadlineTuFormSua(tp.ngayEl, tp.gioEl, tp.phutEl, tp.ampmEl);
+                   danhSachData[idx].deadline    = dl;
+                   danhSachData[idx].batDau      = bdv;
                    danhSachData[idx].danhSach    = selectSua.value || null;
                    danhSachData[idx].lap         = selectLap.value || null;
                   luuDuLieu();
@@ -2429,7 +2507,7 @@
 
                   let gio = document.createElement("span");
                   gio.className = "lich-task-gio";
-                  gio.textContent = dinhDangGio(task.deadline) || "Cả ngày";
+                  gio.textContent = dinhDangGio(task.deadline) ? ((task.batDau ? dinhDangHHmm(task.batDau) + " → " : "") + dinhDangGio(task.deadline)) : "Cả ngày";
 
                   let ten = document.createElement("span");
                   ten.className = "lich-task-ten";
@@ -2501,12 +2579,12 @@
 
               danhSachData.forEach(function(task) {
                   if (!task.deadline || task.deadline.indexOf("T") === -1 || task.hoànThành) return;
-                  let hetHan  = new Date(task.deadline);
+                  let hetHan  = new Date(task.batDau ? task.deadline.split("T")[0] + "T" + task.batDau : task.deadline);
                   let conLai  = (hetHan - bayGio) / 1000 / 60;
                   let key     = task.deadline + task.tenCongViec;
                   if (conLai > 0 && conLai <= 15 && !daNhac[key]) {
                       new Notification("⏰ Sắp đến hạn!", {
-                          body: "\"" + task.tenCongViec + "\" còn 15 phút nữa!"
+                          body: "\"" + task.tenCongViec + "\"" + (task.batDau ? " sắp bắt đầu (còn 15 phút)!" : " còn 15 phút nữa!")
                       });
                       daNhac[key] = true;
                       doi = true;
@@ -2836,7 +2914,7 @@
               const id = taoId();
               idMoi.add(id);
               danhSachData.push({ id: id, tenCongViec: t.tenCongViec, hoànThành: false,
-                  deadline: time ? next + "T" + time : next, danhSach: t.danhSach || null, lap: t.lap, con: copyCon(t) });
+                  deadline: time ? next + "T" + time : next, danhSach: t.danhSach || null, batDau: t.batDau || null, lap: t.lap, con: copyCon(t) });
           }
 
           // ---- Bước nhỏ (checklist) ----
@@ -2999,7 +3077,7 @@
                   const id = taoId();
                   idMoi.add(id);
                   danhSachData.push({ id: id, tenCongViec: c.t.tenCongViec, hoànThành: false,
-                      deadline: time ? next + "T" + time : next, danhSach: c.t.danhSach || null, lap: c.t.lap, con: copyCon(c.t) });
+                      deadline: time ? next + "T" + time : next, danhSach: c.t.danhSach || null, batDau: c.t.batDau || null, lap: c.t.lap, con: copyCon(c.t) });
                   them++;
               });
               if (them) { luuDuLieu(); capNhatTatCaManHinh(); }
@@ -3243,6 +3321,7 @@
                       tenCongViec: t.tenCongViec,
                       hoànThành:   false,
                       deadline:    time ? tomorrow + "T" + time : tomorrow,
+                      batDau:      t.batDau || null,
                       con:         copyCon(t),
                       danhSach:    t.danhSach || null
                   });
@@ -3268,13 +3347,19 @@
                   return;
               }
 
+              let dl  = layDeadlineTuForm() || (document.getElementById("input-lap").value ? layNgayHomNay() : null);
+              let bdv = layGioTuSelect(document.getElementById("input-bd-gio"), document.getElementById("input-bd-phut"), document.getElementById("input-bd-ampm"));
+              let loi = loiBatDau(dl, bdv);
+              if (loi) { alert(loi); return; }
+
               let id = taoId();
               idMoi.add(id);
               danhSachData.push({
                   id:          id,
                   tenCongViec: congViec,
+                  batDau:      bdv,
                   hoànThành:   false,
-                  deadline:    layDeadlineTuForm() || (document.getElementById("input-lap").value ? layNgayHomNay() : null),
+                  deadline:    dl,
                   danhSach:    inputDanhSach.value || null,
                   lap:         document.getElementById("input-lap").value || null
               });
