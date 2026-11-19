@@ -1164,6 +1164,11 @@
           .pol-xoa { position: absolute; top: -8px; right: -8px; display: none; width: 22px; height: 22px; border-radius: 50%; border: none; cursor: pointer;
                      background: var(--btn-primary); color: #fff; font-size: 11px; line-height: 22px; padding: 0; }
           .pol:hover .pol-xoa { display: block; }
+          /* Màu đặc (không viền, không trong suốt chồng nhau) cho cây */
+          .deco-plant .pa { fill: currentColor; }
+          .deco-plant .pb { fill: color-mix(in srgb, currentColor 62%, #fff); }
+          .deco-plant .pc { fill: color-mix(in srgb, currentColor 78%, #000); }
+          .deco-plant .pd { fill: color-mix(in srgb, currentColor 70%, #fff); }
       </style>
   </head>
   <body>
@@ -1194,17 +1199,20 @@
                     <button onclick="pomoDoiCheDo()" title="Đổi Tập trung / Nghỉ">⇄</button>
                 </div>
             </div>
-            <svg class="deco deco-plant tuong-tac" id="cay" viewBox="0 0 140 190"><title>Cây hôm nay</title><g fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-<ellipse cx="70" cy="184" rx="44" ry="6" fill="currentColor" fill-opacity=".1" stroke="none"/>
-<path d="M70 122v-12"/>
-<path class="g" data-g="1" d="M70 122C70 92 66 62 70 32"/>
-<path class="g" data-g="2" d="M70 98C48 94 34 78 36 60c22 2 36 18 34 38z" fill="currentColor" fill-opacity=".12"/>
-<path class="g" data-g="3" d="M70 82C92 78 106 62 104 44c-22 2-36 18-34 38z" fill="currentColor" fill-opacity=".12"/>
-<path class="g" data-g="4" d="M70 58C56 52 50 40 54 24c14 4 22 18 16 34z" fill="currentColor" fill-opacity=".12"/>
-<path class="g" data-g="4" d="M70 40C62 26 66 14 70 6c4 8 8 20 0 34z" fill="currentColor" fill-opacity=".12"/>
-<g class="g" data-g="5" fill="currentColor" fill-opacity=".35"><circle cx="36" cy="56" r="7"/><circle cx="104" cy="40" r="7"/><circle cx="70" cy="6" r="7"/></g>
-<path d="M30 122h80v14H30z" fill="currentColor" fill-opacity=".12"/>
-<path d="M36 136h68l-8 42a8 8 0 0 1-8 6H52a8 8 0 0 1-8-6z" fill="currentColor" fill-opacity=".12"/></g></svg>
+            <svg class="deco deco-plant tuong-tac" id="cay" viewBox="0 -8 140 198"><title>Cây hôm nay</title>
+<defs><g id="hoa"><g fill="#f6bfca"><ellipse cy="-6" rx="3.6" ry="6"/><ellipse cy="-6" rx="3.6" ry="6" transform="rotate(72)"/><ellipse cy="-6" rx="3.6" ry="6" transform="rotate(144)"/><ellipse cy="-6" rx="3.6" ry="6" transform="rotate(216)"/><ellipse cy="-6" rx="3.6" ry="6" transform="rotate(288)"/></g><circle r="3" fill="#f2c14e"/></g></defs>
+<ellipse cx="70" cy="186" rx="40" ry="5" fill="currentColor" fill-opacity=".15"/>
+<ellipse cx="70" cy="123" rx="38" ry="5" class="pc"/>
+<g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M70 124v-12"/><path class="g" data-g="1" d="M70 124C70 96 69 66 70 44"/></g>
+<path class="pb" d="M70 116C61 116 57 110 57 104C65 104 69 109 70 116z"/><path class="pb" d="M70 112C79 112 83 106 83 100C75 100 71 105 70 112z"/>
+<g class="g" data-g="2"><path class="pa" d="M70 100C52 100 34 88 30 66C52 66 68 80 70 100z"/><path fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="1.3" stroke-linecap="round" d="M70 100C56 90 42 78 33 68"/></g>
+<g class="g" data-g="3"><path class="pb" d="M70 84C88 84 106 72 110 50C88 50 72 64 70 84z"/><path fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="1.3" stroke-linecap="round" d="M70 84C84 74 98 62 107 52"/></g>
+<g class="g" data-g="4"><path class="pc" d="M70 66C56 64 44 54 42 36C58 38 70 50 70 66z"/><path fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="1.3" stroke-linecap="round" d="M70 66C58 56 48 46 44 38"/></g>
+<g class="g" data-g="4"><path class="pa" d="M70 48C60 38 60 22 70 8C80 22 80 38 70 48z"/><path fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="1.3" stroke-linecap="round" d="M70 46V14"/></g>
+<g class="g" data-g="5"><use href="#hoa" x="31" y="62"/><use href="#hoa" x="109" y="46"/><use href="#hoa" x="70" y="6"/></g>
+<path class="pd" d="M38 134h64l-7 43a8 8 0 0 1-8 7H53a8 8 0 0 1-8-7z"/>
+<rect class="pc" x="28" y="120" width="84" height="15" rx="4"/>
+<path d="M48 146l4 24" fill="none" stroke="#fff" stroke-opacity=".3" stroke-width="3" stroke-linecap="round"/></svg>
         </div>
     </div>
 
