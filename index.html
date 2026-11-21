@@ -1211,8 +1211,8 @@
           @keyframes gatDau { 50% { transform: translateY(-5px) rotate(-4deg); } }
           #meo.vuon { transform-origin: 50% 100%; animation: vuonVai 2.8s ease; }
           @keyframes vuonVai { 0%, 100% { transform: scale(1); } 40% { transform: scale(1.18, 0.86) translateX(-6px); } 70% { transform: scale(1.22, 0.82); } }
-          .bi.roi { animation: rotBi 0.8s cubic-bezier(0.3, 0, 0.6, 1); }
-          @keyframes rotBi { from { transform: translateY(-110px); opacity: 0; } 30% { opacity: 1; } }
+          .bi.roi { animation: rotBi 1.1s ease-in; }
+          @keyframes rotBi { 0% { transform: translate(var(--lan, 0px), -110px); opacity: 0; } 15% { opacity: 1; } 50% { transform: translate(var(--lan, 0px), 0); } 63% { transform: translate(calc(var(--lan, 0px) * 0.5), -10px); } 76% { transform: translate(calc(var(--lan, 0px) * 0.2), 0); } 86% { transform: translate(0, -3px); } 100% { transform: translate(0, 0); } }
 
           /* ===== Lịch xé / sách / đèn / âm thanh / mèo nói ===== */
           @media (min-width: 1360px) { #btn-dark { display: none; } }
@@ -1236,7 +1236,7 @@
           .meo-noi::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border: 5px solid transparent; border-top-color: var(--border); }
           .meo-noi.hien { opacity: 1; }
           .deco-sach .bi, .deco-hu .bi { transform-box: fill-box; }
-          .deco-den { cursor: pointer; }
+          .deco-den { cursor: pointer; overflow: visible; }   /* quầng sáng rộng hơn khung SVG nên không được cắt */
           .deco-den .pa { fill: color-mix(in srgb, currentColor 62%, #fff); }
           .deco-den .pc { fill: color-mix(in srgb, currentColor 78%, #000); }
           .den-sang { opacity: 0; transition: opacity 0.6s; }
@@ -1249,6 +1249,113 @@
           .am-nut button { border: 1px solid var(--border-input); background: var(--bg-item); color: var(--text-main); border-radius: 999px; padding: 3px 10px; font: inherit; font-size: 12px; cursor: pointer; }
           .am-nut button.bat { background: var(--btn-primary); border-color: var(--btn-primary); color: #fff; }
           .am-box input[type="range"] { width: 100%; margin-top: 8px; accent-color: var(--btn-primary); }
+
+          /* ===== Mùa lễ / đèn dây / đom đóm / bướm / đĩa than / đồng hồ cát / bể cá ===== */
+          .pomo-hang { display: flex; align-items: center; justify-content: center; gap: 10px; }
+          .hg { width: 34px; height: auto; color: var(--text-muted); flex: 0 0 auto; }
+          .hg-cat { fill: #d9b25f; } .hg-day { stroke: #d9b25f; }
+          .cay-wrap { position: relative; line-height: 0; }
+          .buom { position: absolute; left: 58%; top: 2%; width: clamp(18px, 1.8vw, 28px); opacity: 0; pointer-events: none; animation: buomBay 45s ease-in-out infinite; }
+          .buom .canh { transform-origin: 15px 12px; animation: vo 0.3s ease-in-out infinite alternate; }
+          @keyframes vo { to { transform: scaleX(0.35); } }
+          @keyframes buomBay {
+              0%, 52% { opacity: 0; transform: translate(150px, -90px); }
+              54% { opacity: 1; transform: translate(130px, -80px); }
+              60% { transform: translate(70px, -30px) rotate(-8deg); }
+              66% { transform: translate(20px, -8px); }
+              70%, 86% { opacity: 1; transform: translate(0, 0); }
+              90% { opacity: 1; transform: translate(30px, -40px); }
+              96% { opacity: 1; transform: translate(120px, -110px); }
+              100% { opacity: 0; transform: translate(160px, -130px); }
+          }
+          .dia { display: block; width: 100%; max-width: 120px; margin: 0 auto 8px; cursor: pointer; }
+          .dia-de { fill: color-mix(in srgb, var(--btn-primary) 45%, #fff); }
+          .dia-dia { transform-origin: 48px 46px; animation: quayDia 2.4s linear infinite; animation-play-state: paused; }
+          .dia.quay .dia-dia { animation-play-state: running; }
+          @keyframes quayDia { to { transform: rotate(360deg); } }
+          .dia-can { transform-origin: 100px 28px; transform: rotate(-26deg); transition: transform 0.8s; }
+          .dia.quay .dia-can { transform: rotate(0); }
+          .ho-ca { width: clamp(110px, min(11vw, 18vh), 180px); color: var(--btn-primary); }
+          .ho-ca svg { width: 100%; height: auto; display: block; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.12)); }
+          .ca-boi { transform-box: fill-box; transform-origin: center; animation: caBoi 12s linear infinite; }
+          @keyframes caBoi {
+              0% { transform: translateX(16px) scaleX(1); } 48% { transform: translateX(114px) scaleX(1); }
+              50% { transform: translateX(114px) scaleX(-1); } 98% { transform: translateX(16px) scaleX(-1); } 100% { transform: translateX(16px) scaleX(1); }
+          }
+          .dom { position: absolute; width: 4px; height: 4px; border-radius: 50%; background: #d8ff8a; box-shadow: 0 0 8px 3px rgba(190,255,110,0.7); animation: troiDom 14s linear infinite, nhapDom 3s ease-in-out infinite; }
+          @keyframes troiDom { 0%, 100% { transform: translate(0,0); } 25% { transform: translate(20px,-30px); } 50% { transform: translate(-10px,-55px); } 75% { transform: translate(25px,-30px); } }
+          @keyframes nhapDom { 0%, 100% { opacity: 0.1; } 50% { opacity: 1; } }
+          #as-dip { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+          .dip { position: absolute; }
+          .dip.giangsinh { top: -10px; width: var(--s); height: var(--s); border-radius: 50%; background: #fff; box-shadow: 0 0 3px rgba(120,150,190,0.85); opacity: 0.9; animation: ruoi linear infinite; }
+          .dip.tet { top: -12px; width: 9px; height: 12px; border-radius: 50% 0 50% 50%; background: #f6c026; animation: ruoiHoa linear infinite; }
+          .dip.tet:nth-child(4n) { background: #e8505b; }
+          .dip.trungthu { bottom: -30px; width: 16px; height: 20px; border-radius: 6px; background: #ff8c42; box-shadow: 0 0 14px 4px rgba(255,160,70,0.6); animation: bayLong linear infinite; }
+          @keyframes ruoi { to { transform: translate(var(--dx), 105vh); } }
+          @keyframes ruoiHoa { to { transform: translate(var(--dx), 105vh) rotate(540deg); } }
+          @keyframes bayLong { to { transform: translate(var(--dx), -110vh); } }
+          @media (max-height: 820px) { .dia { display: none; } }
+
+          /* ===== Hiệu ứng nâng cấp cho các món có sẵn ===== */
+          .m-mo circle { transform-box: fill-box; transform-origin: center; animation: chop 5.5s ease-in-out infinite; }
+          @keyframes chop { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
+          .tai-p { transform-origin: 110px 40px; animation: giatTai 7s ease-in-out infinite; }
+          .tai-t { transform-origin: 90px 40px; animation: giatTai 9s ease-in-out infinite; animation-delay: -3s; }
+          @keyframes giatTai { 0%, 93%, 100% { rotate: 0deg; } 95% { rotate: -9deg; } 97% { rotate: 3deg; } }
+          .m-ngap { opacity: 0; transform-box: fill-box; transform-origin: center; }
+          #meo.ngap .m-ngap { animation: ngapMieng 1.6s ease; }
+          @keyframes ngapMieng { 0% { opacity: 0; transform: scale(0.3); } 30%, 70% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(0.3); } }
+          #meo.ngap .m-dau { animation: ngapDau 1.6s ease; }
+          @keyframes ngapDau { 30%, 70% { transform: translateY(-3px) rotate(-6deg); } }
+          #meo.canh .m-dau { transform: translateY(-4px); transition: transform 0.5s; }
+          #meo.canh .m-duoi { animation-duration: 7s; }
+          #meo.ngu-tam .m-nham { display: inline; } #meo.ngu-tam .m-mo { display: none; } #meo.ngu-tam .m-zzz { opacity: 1; }
+
+          .ho-ca { cursor: pointer; }
+          .bot { animation: noiBot 4.5s ease-in infinite; transform-box: fill-box; }
+          @keyframes noiBot { 0% { transform: translateY(0); opacity: 0; } 15% { opacity: 0.8; } 100% { transform: translateY(-50px); opacity: 0; } }
+          .thuc-an { animation: rotAn 1.6s ease-in forwards; transform-box: fill-box; }
+          @keyframes rotAn { to { transform: translateY(56px); } }
+          .ho-ca.an .ca-boi { animation-duration: 5s !important; }
+          body[data-buoi="toi"] .ca-boi { filter: drop-shadow(0 0 3px rgba(255,255,255,0.85)) brightness(1.15); }
+          .rong { transform-box: fill-box; transform-origin: 50% 100%; animation: layRong 4s ease-in-out infinite alternate; }
+          @keyframes layRong { from { rotate: -4deg; } to { rotate: 4deg; } }
+
+          .deco-hu { transform-origin: 50% 100%; }
+          .deco-hu.lac { animation: lacLo 0.6s ease; }
+          @keyframes lacLo { 20% { transform: rotate(-7deg); } 45% { transform: rotate(6deg); } 70% { transform: rotate(-3deg); } }
+          .deco-hu.lac .bi { animation: nhayBi 0.5s ease; animation-delay: calc(var(--k, 0) * 18ms); }
+          @keyframes nhayBi { 40% { transform: translateY(-9px); } }
+          .deco-sach { transform-origin: 50% 100%; transition: transform 0.8s; }
+          .deco-sach.cao { transform: rotate(2.2deg); }
+          .deco-sach .bi.roi { animation: rotSach 0.7s ease-in; }
+          @keyframes rotSach { 0% { transform: translateY(-110px); opacity: 0; } 15% { opacity: 1; } 55% { transform: translateY(0); } 70% { transform: translateY(-5px); } 85%, 100% { transform: translateY(0); } }
+          .deco-sach.rung { animation: rungSach 0.5s ease; }
+          @keyframes rungSach { 25% { transform: rotate(-1.6deg); } 60% { transform: rotate(1.4deg); } }
+
+          body[data-buoi="toi"] .deco-plant .g.on:not([data-g="1"]) { transform: scaleX(0.72); }
+          .deco-plant .g[data-g="5"] { transition: opacity 2.2s, transform 2.8s cubic-bezier(0.2, 1.4, 0.4, 1); }
+          .deco-plant { cursor: pointer; }
+          .deco-plant.lon { transform-origin: 50% 100%; animation: nhichLon 1s ease; }
+          @keyframes nhichLon { 40% { transform: scale(1.07); } }
+          .giot { animation: rotGiot 0.9s ease-in forwards; transform-box: fill-box; }
+          @keyframes rotGiot { 0% { opacity: 0; transform: translateY(0); } 20% { opacity: 1; } 100% { opacity: 0; transform: translateY(120px); } }
+
+          .dia { overflow: visible; }
+          .nt { opacity: 0; font-size: 14px; fill: var(--btn-primary); }
+          .dia.quay .nt { animation: bayNhac 2.6s ease-out infinite; }
+          @keyframes bayNhac { 0% { opacity: 0; transform: translate(0, 0); } 15% { opacity: 1; } 100% { opacity: 0; transform: translate(14px, -34px); } }
+          .dia.quay .dia-can { animation: nhapKim 0.9s ease-in-out infinite alternate; }
+          @keyframes nhapKim { from { transform: rotate(0); } to { transform: rotate(-1.4deg); } }
+          .hg.lat { animation: latHg 0.8s ease; }
+          @keyframes latHg { from { transform: rotate(0); } to { transform: rotate(180deg); } }
+          .hg.rung { animation: rungHg 0.25s linear infinite; }
+          @keyframes rungHg { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+
+          .dom.them { display: none; } body.gio-ngu .dom.them { display: block; }
+          body.gio-ngu::after { content: ""; position: fixed; inset: 0; background: rgba(255,170,80,0.06); pointer-events: none; z-index: 500; }
+
+                     border-bottom: 1px dashed var(--border); font-size: 13px; font-variant-numeric: tabular-nums; color: var(--text-main); }
       </style>
   </head>
   <body>
@@ -1262,7 +1369,14 @@
             <div class="cs-wrap">
                 <div class="cua-so tuong-tac" id="cua-so"><div class="cs-troi"><div class="cs-sao"></div><i class="cs-mat" id="cs-mat"></i><i class="cs-may m1"></i><i class="cs-may m2"></i></div><div class="cs-khung"></div></div>
             </div>
-            <div class="desk-row"><div class="pol tuong-tac" id="pol-1" style="transform:rotate(-5deg)"></div><div class="pol tuong-tac" id="pol-2" style="transform:rotate(4deg)"></div></div>
+            <div class="ho-ca tuong-tac" onclick="choCaAn()"><svg viewBox="0 0 130 86"><title>Bể cá</title>
+<defs><linearGradient id="gNuoc" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bfe6f2" stop-opacity=".55"/><stop offset="1" stop-color="#7fc4dc" stop-opacity=".8"/></linearGradient></defs>
+<rect x="4" y="8" width="122" height="72" rx="8" fill="url(#gNuoc)"/>
+<rect x="4" y="68" width="122" height="12" rx="6" fill="#e6d3a8"/>
+<path class="rong" d="M20 70c-3-10 3-14 0-24M26 70c3-8-2-12 1-20M108 70c3-9-2-13 1-22" stroke="#6bb88a" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+<g id="ca-ds"></g><g id="ca-bot"></g>
+<rect x="4" y="8" width="122" height="72" rx="8" fill="none" stroke="currentColor" stroke-width="2.5" opacity=".6"/>
+<path d="M12 16v26" stroke="#fff" stroke-opacity=".5" stroke-width="3" stroke-linecap="round"/></svg></div><div class="desk-row"><div class="pol tuong-tac" id="pol-1" style="transform:rotate(-5deg)"></div><div class="pol tuong-tac" id="pol-2" style="transform:rotate(4deg)"></div></div>
             <div class="desk-row"><svg class="deco deco-cup" viewBox="0 0 120 140" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
 <ellipse cx="62" cy="124" rx="50" ry="9" fill="currentColor" fill-opacity=".1" stroke="none"/>
 <path class="steam" d="M44 36c-6-8 6-12 0-22"/><path class="steam" style="animation-delay:.8s" d="M62 36c-6-8 6-12 0-22"/><path class="steam" style="animation-delay:1.6s" d="M80 36c-6-8 6-12 0-22"/>
@@ -1271,11 +1385,11 @@
 <ellipse cx="65" cy="87" rx="54" ry="5" fill="currentColor" fill-opacity=".15"/>
 <g class="m-duoi"><path d="M26 78C6 78 2 54 20 50" fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round"/></g>
 <path class="mc" d="M20 82C8 70 18 42 52 40C86 38 104 54 102 82z"/>
-<g class="m-dau"><path class="mc" d="M80 44L83 22L97 34z"/><path class="mc" d="M120 44L117 22L103 34z"/>
+<g class="m-dau"><path class="mc tai-t" d="M80 44L83 22L97 34z"/><path class="mc tai-p" d="M120 44L117 22L103 34z"/>
 <circle class="mb" cx="100" cy="54" r="22"/>
 <g class="m-mo"><circle cx="92" cy="52" r="2.6" fill="#3b2f2a"/><circle cx="108" cy="52" r="2.6" fill="#3b2f2a"/></g>
 <g class="m-nham" fill="none" stroke="#3b2f2a" stroke-width="2" stroke-linecap="round"><path d="M88 53q4 3 8 0"/><path d="M104 53q4 3 8 0"/></g>
-<path d="M97 59h6l-3 3.5z" fill="#e59ab3"/></g>
+<path d="M97 59h6l-3 3.5z" fill="#e59ab3"/><ellipse class="m-ngap" cx="100" cy="65" rx="4" ry="5" fill="#8a3b3b"/></g>
 <g class="m-zzz" fill="currentColor" font-size="11" font-weight="700"><text class="zz" x="116" y="20">z</text><text class="zz" style="animation-delay:.9s" x="123" y="12">z</text></g></svg></div></div>
             <input type="file" id="pol-file" accept="image/*" style="display:none">
         </div>
@@ -1283,15 +1397,19 @@
             <div class="the-pomo tuong-tac">
                 <div class="pomo-gio" id="pomo-gio">--:--</div>
                 <div class="pomo-task" id="pomo-task"></div>
-                <div class="pomo-dem" id="pomo-dem">25:00</div>
-                <div class="pomo-che-do" id="pomo-che-do">Tập trung</div>
+                <div class="pomo-hang"><svg class="hg" id="hg" viewBox="0 0 40 60"><defs><clipPath id="hgC"><path d="M9 7H31C31 19 24 24 22 30C24 36 31 41 31 53H9C9 41 16 36 18 30C16 24 9 19 9 7Z"/></clipPath></defs>
+<g clip-path="url(#hgC)"><rect id="hg-tren" class="hg-cat" x="8" y="8" width="24" height="22"/><rect id="hg-duoi" class="hg-cat" x="8" y="52" width="24" height="0"/></g>
+<line id="hg-day" class="hg-day" x1="20" x2="20" y1="30" y2="52" stroke-width="1.3" opacity="0"/>
+<path d="M9 7H31C31 19 24 24 22 30C24 36 31 41 31 53H9C9 41 16 36 18 30C16 24 9 19 9 7Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+<rect x="6" y="3" width="28" height="4" rx="1.5" fill="currentColor"/><rect x="6" y="53" width="28" height="4" rx="1.5" fill="currentColor"/></svg><div><div class="pomo-dem" id="pomo-dem">25:00</div>
+                <div class="pomo-che-do" id="pomo-che-do">Tập trung</div></div></div>
                 <div class="pomo-nut">
                     <button class="chinh" id="pomo-bt" onclick="pomoBatDau()">▶ Bắt đầu</button>
                     <button onclick="pomoReset()" title="Đặt lại">↺</button>
                     <button onclick="pomoDoiCheDo()" title="Đổi Tập trung / Nghỉ">⇄</button>
                 </div>
             </div>
-            <div class="desk-row"><svg class="deco deco-plant tuong-tac" id="cay" viewBox="0 -8 140 198"><title>Cây hôm nay</title>
+            <div class="desk-row"><div class="cay-wrap"><svg class="deco deco-plant tuong-tac" id="cay" viewBox="0 -8 140 198" onclick="tuoiCay()"><title>Cây hôm nay</title>
 <defs><g id="hoa"><g fill="#f6bfca"><ellipse cy="-6" rx="3.6" ry="6"/><ellipse cy="-6" rx="3.6" ry="6" transform="rotate(72)"/><ellipse cy="-6" rx="3.6" ry="6" transform="rotate(144)"/><ellipse cy="-6" rx="3.6" ry="6" transform="rotate(216)"/><ellipse cy="-6" rx="3.6" ry="6" transform="rotate(288)"/></g><circle r="3" fill="#f2c14e"/></g></defs>
 <ellipse cx="70" cy="186" rx="40" ry="5" fill="currentColor" fill-opacity=".15"/>
 <ellipse cx="70" cy="123" rx="38" ry="5" class="pc"/>
@@ -1304,7 +1422,7 @@
 <g class="g" data-g="5"><use href="#hoa" x="31" y="62"/><use href="#hoa" x="109" y="46"/><use href="#hoa" x="70" y="6"/></g>
 <path class="pd" d="M38 134h64l-7 43a8 8 0 0 1-8 7H53a8 8 0 0 1-8-7z"/>
 <rect class="pc" x="28" y="120" width="84" height="15" rx="4"/>
-<path d="M48 146l4 24" fill="none" stroke="#fff" stroke-opacity=".3" stroke-width="3" stroke-linecap="round"/></svg><svg class="deco deco-hu tuong-tac" id="hu" viewBox="0 0 120 150"><title>Lọ chiến thắng</title>
+<path d="M48 146l4 24" fill="none" stroke="#fff" stroke-opacity=".3" stroke-width="3" stroke-linecap="round"/></svg><svg class="buom" viewBox="0 0 30 24" aria-hidden="true"><g class="canh"><path d="M15 12C9 2 1 4 3 11c1 5 8 3 12 1z" fill="#f4a261"/></g><g class="canh"><path d="M15 12C21 2 29 4 27 11c-1 5-8 3-12 1z" fill="#f4a261"/></g><path d="M15 6v13" stroke="#5a4636" stroke-width="1.6" stroke-linecap="round"/></svg></div><svg class="deco deco-hu tuong-tac" id="hu" viewBox="0 0 120 150" onclick="lacLo()"><title>Lọ chiến thắng</title>
 <ellipse cx="60" cy="146" rx="42" ry="4" fill="currentColor" fill-opacity=".15"/>
 <g id="hu-bi"></g>
 <path d="M30 24h60v6c8 4 14 12 14 22v78a12 12 0 0 1-12 12H28a12 12 0 0 1-12-12V52c0-10 6-18 14-22z" fill="currentColor" fill-opacity=".07" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
@@ -1318,7 +1436,10 @@
 <path d="M58 132L76 84L48 58" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
 <path class="pa" d="M16 66L32 36h34l14 30z" transform="rotate(-24 48 56)"/>
 <ellipse class="den-bong" cx="40" cy="70" rx="9" ry="5"/></svg></div>
-            <div class="am-box tuong-tac"><div class="am-nut"><button id="am-chim" onclick="amBat('chim')">Birdsong</button></div>
+            <div class="am-box tuong-tac"><svg class="dia" id="dia" viewBox="0 0 120 80" onclick="amBat('chim')"><title>Birdsong</title>
+<rect class="dia-de" x="3" y="14" width="114" height="62" rx="7"/>
+<g class="dia-dia"><circle cx="48" cy="46" r="27" fill="#2b2622"/><circle cx="48" cy="46" r="21" fill="none" stroke="#4a423b"/><circle cx="48" cy="46" r="15" fill="none" stroke="#4a423b"/><circle cx="48" cy="46" r="9" fill="#e07a5f"/><circle cx="48" cy="46" r="1.8" fill="#fff"/><path d="M48 19a27 27 0 0 1 14 4" stroke="#fff" stroke-opacity=".25" stroke-width="2" fill="none"/></g>
+<g class="dia-can"><circle cx="100" cy="28" r="5" fill="#d8d0c4"/><path d="M100 28L70 52" stroke="#d8d0c4" stroke-width="3" stroke-linecap="round"/><rect x="64" y="50" width="9" height="5" rx="1.5" transform="rotate(40 68 52)" fill="#8a7d6b"/></g><text class="nt" x="36" y="20">♪</text><text class="nt" x="52" y="16" style="animation-delay:.9s">♫</text><text class="nt" x="64" y="22" style="animation-delay:1.8s">♪</text></svg><div class="am-nut"><button id="am-chim" onclick="amBat('chim')">Birdsong</button></div>
                 <input type="range" id="am-vol" min="0" max="100" value="40" oninput="amVol(this.value)" title="Âm lượng"></div>
         </div>
     </div>
@@ -2395,9 +2516,10 @@
               let hoànThành = daDuocLoc.filter(item => item.hoànThành).length;
               let chuaXong  = tatCa - hoànThành;
               let phanTram  = tatCa === 0 ? 0 : Math.round((hoànThành / tatCa) * 100);
-              if (phanTram === 100 && tatCa > 0 && tatCaTruoc === tatCa && phanTramTruoc !== null && phanTramTruoc < 100) { confetti(); meoVuon(); meoNoi("Xong hết task hôm nay rồi! Nghỉ ngơi thôi nào.", 6000); }
+              if (phanTram === 100 && tatCa > 0 && tatCaTruoc === tatCa && phanTramTruoc !== null && phanTramTruoc < 100) { confetti(); meoVuon(); meoNoi("Xong hết task hôm nay rồi! Nghỉ ngơi thôi nào.", 6000); lacLo(); caVui(5000); cayNhich(); }
               tatCaTruoc = tatCa; phanTramTruoc = phanTram;
               capNhatCay(tatCa, phanTram);
+              ghiNgayXong();
 
               let progressWrap = document.getElementById("progress-wrap");
               let dem          = document.getElementById("dem");
@@ -3008,6 +3130,7 @@
               themBi(t);
               meoVui();
               meoNoi(KHEN[Math.floor(Math.random() * KHEN.length)]);
+              tiecXong();
               if (!t.lap) return;
               const next = ngayLapTiep(toDateKeyFromDeadline(t.deadline) || layNgayHomNay(), t.lap);
               const trung = danhSachData.some(x => x.id !== t.id && x.tenCongViec === t.tenCongViec &&
@@ -3179,7 +3302,7 @@
           // ---- Ánh sáng theo giờ + hạt bụi trong nắng ----
           function veAnhSang() {
               const h = new Date().getHours();
-              document.body.dataset.buoi = (h >= 5 && h < 11) ? "sang" : (h >= 11 && h < 15) ? "trua" : (h >= 15 && h < 18) ? "chieu" : "toi";
+              document.body.dataset.buoi = (h >= 6 && h < 11) ? "sang" : (h >= 11 && h < 15) ? "trua" : (h >= 15 && h < 18) ? "chieu" : "toi";
           }
           (function() {
               const box = document.getElementById("as-bui");
@@ -3226,13 +3349,24 @@
               document.getElementById("pomo-che-do").textContent = pomo.che === "tt" ? "Tập trung" : "Nghỉ ngơi";
               document.getElementById("pomo-bt").textContent = pomo.chay ? "⏸ Tạm dừng" : "▶ Bắt đầu";
               document.title = pomo.chay ? txt + " · " + TIEU_DE_GOC : TIEU_DE_GOC;
+              const hgEl = document.getElementById("hg");
+              if (hgEl) hgEl.classList.toggle("rung", pomo.chay && pomo.conLai > 0 && pomo.conLai <= 10);
+              const meoEl = document.getElementById("meo");
+              if (meoEl) meoEl.classList.toggle("canh", pomo.chay && pomo.che === "tt");
+              // đồng hồ cát: cát chảy theo phần đã trôi qua
+              const tien = Math.min(1, Math.max(0, 1 - pomo.conLai / POMO_GIAY[pomo.che])), hgT = document.getElementById("hg-tren");
+              if (hgT) {
+                  hgT.setAttribute("y", 8 + 22 * tien); hgT.setAttribute("height", 22 * (1 - tien));
+                  const hgD = document.getElementById("hg-duoi"); hgD.setAttribute("y", 52 - 22 * tien); hgD.setAttribute("height", 22 * tien);
+                  const hgL = document.getElementById("hg-day"); hgL.setAttribute("y2", 52 - 22 * tien); hgL.setAttribute("opacity", pomo.chay && tien < 1 ? 1 : 0);
+              }
           }
 
           function pomoBip() {
               try {
                   const c = new (window.AudioContext || window.webkitAudioContext)();
                   const o = c.createOscillator(), g = c.createGain();
-                  o.frequency.value = 880; g.gain.value = 0.15;
+                  o.frequency.value = 880; g.gain.value = document.body.classList.contains("gio-ngu") ? 0.04 : 0.15;
                   o.connect(g); g.connect(c.destination); o.start();
                   setTimeout(() => { o.stop(); c.close(); }, 600);
               } catch (e) {}
@@ -3245,7 +3379,7 @@
               pomoVe();
           }
           function pomoReset() { pomo.chay = false; pomo.conLai = POMO_GIAY[pomo.che]; pomoVe(); }
-          function pomoDoiCheDo() { pomo.che = pomo.che === "tt" ? "nghi" : "tt"; pomoReset(); }
+          function pomoDoiCheDo() { pomo.che = pomo.che === "tt" ? "nghi" : "tt"; pomoReset(); hgLat(); }
 
           function pomoTick() {
               const gio = document.getElementById("pomo-gio");
@@ -3263,9 +3397,11 @@
                       pomo.chay = false;
                       pomo.conLai = POMO_GIAY[pomo.che];
                       pomoBip();
+                      if (vuaTT) meoNgap();
+                      hgLat();
                       meoNoi(vuaTT ? "Hết giờ tập trung! Nghỉ 5 phút nhé." : "Hết giờ nghỉ, vào việc thôi!", 6000);
                       if ("Notification" in window && Notification.permission === "granted") {
-                          new Notification(vuaTT ? "🍅 Hết giờ tập trung!" : "⏰ Hết giờ nghỉ!", { body: vuaTT ? "Nghỉ 5 phút nhé." : "Sẵn sàng tập trung tiếp." });
+                          new Notification(vuaTT ? "🍅 Hết giờ tập trung!" : "⏰ Hết giờ nghỉ!", { body: vuaTT ? "Nghỉ 5 phút nhé." : "Sẵn sàng tập trung tiếp.", silent: document.body.classList.contains("gio-ngu") });
                       }
                   }
               }
@@ -3356,15 +3492,24 @@
               const i = t.danhSach ? danhMucList.indexOf(t.danhSach) : -1;
               hu.bi.push({ id: t.id, ngay: layNgayHomNay(), mau: i >= 0 ? MAU_BI[i % MAU_BI.length] : "#c9b79c" });
               luuHu(); veHu(t.id); veSach(t.id);
+              if (hu.bi.length === 35) { confetti(); meoNoi("Lọ chiến thắng đầy rồi, giỏi quá!", 6000); }
           }
           function boBi(id) { chuanHu(); hu.bi = hu.bi.filter(b => b.id !== id); luuHu(); veHu(); veSach(); }
+          // Task nào bị xoá thì viên bi (lọ) và cuốn sách (chồng sách) của nó cũng biến mất
+          function donDepHu() {
+              chuanHu();
+              const con = new Set(danhSachData.map(t => t.id));
+              const truoc = hu.bi.length;
+              hu.bi = hu.bi.filter(b => con.has(b.id));
+              if (hu.bi.length !== truoc) { luuHu(); veHu(); veSach(); }
+          }
           function veHu(idMoiBi) {
               chuanHu();
               const g = document.getElementById("hu-bi");
               if (!g) return;
               g.innerHTML = hu.bi.slice(-35).map(function(b, i) {
                   const r = Math.floor(i / 5), c = i % 5, cx = 33 + 13 * c + (r % 2) * 6.5, cy = 134 - 12 * r;
-                  return '<g class="bi' + (b.id === idMoiBi ? " roi" : "") + '"><circle cx="' + cx + '" cy="' + cy + '" r="6" fill="' + b.mau + '"/>' +
+                  return '<g class="bi' + (b.id === idMoiBi ? " roi" : "") + '" style="--k:' + i + ';--lan:' + ((i % 2 ? 1 : -1) * 7) + 'px"><circle cx="' + cx + '" cy="' + cy + '" r="6" fill="' + b.mau + '"/>' +
                          '<circle cx="' + (cx - 2) + '" cy="' + (cy - 2) + '" r="1.8" fill="#fff" fill-opacity=".6"/></g>';
               }).join("");
               const t = document.querySelector("#hu title");
@@ -3400,6 +3545,9 @@
                   return '<g class="bi' + (b.id === idMoiSach ? " roi" : "") + '"><rect x="' + x + '" y="' + y + '" width="' + w + '" height="12" rx="2" fill="' + b.mau + '"/>' +
                          '<rect x="' + (x + 6) + '" y="' + (y + 4) + '" width="' + (w - 12) + '" height="2" fill="#fff" fill-opacity=".45"/></g>';
               }).join("");
+              const sachEl = document.getElementById("sach");
+              sachEl.classList.toggle("cao", ds.length >= 9);
+              if (idMoiSach) { sachEl.classList.remove("rung"); setTimeout(() => { sachEl.classList.add("rung"); setTimeout(() => sachEl.classList.remove("rung"), 600); }, 450); }
               const t = document.querySelector("#sach title");
               if (t) t.textContent = "Chồng sách hôm nay: " + ds.length + " cuốn";
           }
@@ -3422,6 +3570,9 @@
               meoTimer = setTimeout(() => b.classList.remove("hien"), ms || 4200);
           }
           function meoCham() {
+              const bay = Date.now();
+              meoDem = (bay - meoLan < 2500) ? meoDem + 1 : 1; meoLan = bay;
+              if (meoDem >= 5) { meoDem = 0; meoNgu(); return; }   // bấm liên tục 5 lần → mèo bỏ đi ngủ
               meoVui();
               const toi = document.body.dataset.buoi === "toi";
               const ds = toi ? ["Khuya rồi, ngủ sớm nha.", "Meo... buồn ngủ quá.", "Làm nốt rồi nghỉ thôi."] : ["Meo!", "Cố lên nha!", "Uống nước chưa?", "Đứng dậy vươn vai chút đi."];
@@ -3481,6 +3632,7 @@
               am.nut = []; am.loai = "";
               if (am.ctx) { try { am.ctx.close(); } catch (e) {} am.ctx = null; }
               const b = document.getElementById("am-chim"); if (b) b.classList.remove("bat");
+              const dia = document.getElementById("dia"); if (dia) dia.classList.remove("quay");
           }
           function amBat(loai) {
               if (am.loai === loai) { amDung(); return; }
@@ -3503,11 +3655,226 @@
                   setTimeout(goi, 900 + Math.random() * 3500);
               })();
               document.getElementById("am-chim").classList.add("bat");
+              document.getElementById("dia").classList.add("quay");
           }
           function amVol(v) { am.vol = v / 100; if (am.master) am.master.gain.value = am.vol; }
 
-          veCuaSo(); veHu(); veSach(); veToLich(); capNhatDen(); setTimeout(meoCanhBao, 1500);
-          setInterval(function() { veCuaSo(); veToLich(); veSach(); }, 60 * 1000);
+          // ---- Đom đóm (chỉ hiện buổi tối) ----
+          function taoDomDom() {
+              const d = document.getElementById("desk");
+              if (!d || document.getElementById("as-dom")) return;
+              const box = document.createElement("div");
+              box.id = "as-dom"; box.className = "anh-sang as-dom";
+              for (let i = 0; i < 28; i++) {
+                  const e = document.createElement("i");
+                  e.className = "dom" + (i >= 14 ? " them" : "");
+                  e.style.cssText = "left:" + (Math.random() * 100) + "%;top:" + (35 + Math.random() * 60) + "%;animation-duration:" + (11 + Math.random() * 8) + "s," + (2.5 + Math.random() * 2.5) + "s;animation-delay:-" + (Math.random() * 14) + "s,-" + (Math.random() * 4) + "s";
+                  box.appendChild(e);
+              }
+              d.appendChild(box);
+          }
+
+          // ---- Mùa lễ tự đổi: Giáng sinh (tuyết), Tết (cánh hoa), Trung thu (lồng đèn) ----
+          const NGAY_TET = ["2027-02-06", "2028-01-26", "2029-02-13", "2030-02-03"];
+          const NGAY_TRUNG_THU = ["2026-09-25", "2027-09-15", "2028-10-03", "2029-09-22", "2030-09-12"];
+          let dipHT = null;
+          function loaiDip() {
+              const n = new Date(), hn = new Date(n.getFullYear(), n.getMonth(), n.getDate());
+              const cach = ds => ds.map(x => Math.round((hn - new Date(x + "T00:00:00")) / 864e5));
+              if (cach(NGAY_TET).some(x => x >= -14 && x <= 10)) return "tet";
+              if (cach(NGAY_TRUNG_THU).some(x => x >= -7 && x <= 0)) return "trungthu";
+              if (n.getMonth() === 11 || (n.getMonth() === 0 && n.getDate() <= 5)) return "giangsinh";
+              return "";
+          }
+          function veDip() {
+              const loai = loaiDip();
+              if (loai === dipHT) return;
+              dipHT = loai;
+              const d = document.getElementById("desk");
+              if (!d) return;
+              let box = document.getElementById("as-dip");
+              if (!box) { box = document.createElement("div"); box.id = "as-dip"; d.appendChild(box); }
+              box.innerHTML = "";
+              if (!loai) return;
+              const N = loai === "giangsinh" ? 36 : 26;
+              for (let i = 0; i < N; i++) {
+                  const e = document.createElement("i");
+                  e.className = "dip " + loai;
+                  const dai = loai === "trungthu" ? 20 + Math.random() * 14 : 8 + Math.random() * 10;
+                  e.style.cssText = "left:" + (Math.random() * 100) + "vw;--dx:" + (Math.random() * 120 - 60) + "px;--s:" + (3 + Math.random() * 4) + "px;animation-duration:" + dai + "s;animation-delay:-" + (Math.random() * dai) + "s";
+                  box.appendChild(e);
+              }
+          }
+
+          // ---- Bể cá: xong hết task hôm nay thì thêm 1 con (tối đa 8); bỏ lỡ 1 ngày thì 1 con đi ngủ, làm xong thì đánh thức ----
+          const MAU_CA = ["#ff9f68", "#ffd166", "#ef6f6c", "#8ecae6", "#b08ee6", "#7bd389", "#f4a6c1", "#f7c873"];
+          // Mỗi ngày xong hết task = 1 "bản ghi" kèm danh sách task của ngày đó. Cá được TÍNH LẠI từ các bản ghi này,
+          // nên xoá (hoặc bỏ tick) bất kỳ task nào của ngày đó thì bản ghi, và con cá của nó, mất theo.
+          let beCa = docLocal("beCa", null);
+          function luuBeCa() { try { localStorage.setItem("beCa", JSON.stringify(beCa)); } catch (e) {} }
+          function chuanBeCa() {
+              let doi = false;
+              if (!beCa || typeof beCa !== "object") { beCa = {}; doi = true; }
+              if (!beCa.ds || typeof beCa.ds !== "object") { beCa.ds = {}; doi = true; }
+              Object.keys(beCa.ds).forEach(function(k) {   // chuyển dữ liệu kiểu cũ (ds[ngày] === true)
+                  if (beCa.ds[k] === true) {
+                      const ids = danhSachData.filter(t => toDateKeyFromDeadline(t.deadline) === k).map(t => t.id);
+                      beCa.ds[k] = ids.length ? { ids: ids } : { huy: true };
+                      doi = true;
+                  }
+              });
+              if (!beCa.bat) { const ks = Object.keys(beCa.ds).sort(); beCa.bat = ks.length ? ks[0] : layNgayHomNay(); doi = true; }
+              ["ca", "ngu", "kiem"].forEach(k => { if (k in beCa) { delete beCa[k]; doi = true; } });
+              if (doi) luuBeCa();
+          }
+          function donDepCa() {
+              chuanBeCa();
+              const hn = layNgayHomNay(), con = new Map(danhSachData.map(t => [t.id, t]));
+              let doi = false;
+              Object.keys(beCa.ds).forEach(function(k) {
+                  const r = beCa.ds[k];
+                  if (!r || r.huy) return;
+                  const ok = Array.isArray(r.ids) && r.ids.length > 0 && r.ids.every(id => con.has(id) && con.get(id).hoànThành);
+                  if (!ok) { if (k === hn) delete beCa.ds[k]; else beCa.ds[k] = { huy: true }; doi = true; }
+              });
+              if (doi) { luuBeCa(); veCa(); }
+          }
+          function ghiNgayXong() {
+              chuanBeCa();
+              const hn = layNgayHomNay();
+              if (beCa.ds[hn]) return;
+              const ds = danhSachData.filter(t => !t.luuTru && toDateKeyFromDeadline(t.deadline) === hn);
+              if (!ds.length || !ds.every(t => t.hoànThành)) return;
+              beCa.ds[hn] = { ids: ds.map(t => t.id) };
+              luuBeCa(); veCa();
+          }
+          // Phát lại từng ngày: xong hết → thêm cá (tối đa 8) hoặc đánh thức 1 con đang ngủ; bỏ lỡ 1 ngày → 1 con đi ngủ; ngày bị huỷ thì bỏ qua
+          function tinhBeCa() {
+              chuanBeCa();
+              const hn = layNgayHomNay();
+              let ca = 0, ngu = 0;
+              const d = new Date(beCa.bat + "T00:00:00");
+              for (let an = 0; an < 800 && khoaNgay(d) <= hn; an++, d.setDate(d.getDate() + 1)) {
+                  const k = khoaNgay(d), r = beCa.ds[k];
+                  if (r && !r.huy) { if (ngu > 0) ngu--; else ca = Math.min(8, ca + 1); }
+                  else if (!r && k < hn && ca > 0) ngu = Math.min(ca, ngu + 1);
+              }
+              return { ca: ca, ngu: ngu };
+          }
+          function veCa() {
+              const g = document.getElementById("ca-ds");
+              if (!g) return;
+              const st = tinhBeCa();
+              let h = "";
+              for (let i = 0; i < st.ca; i++) {
+                  const ngu = i >= st.ca - st.ngu, mau = MAU_CA[i % MAU_CA.length];
+                  const than = '<ellipse cx="0" cy="0" rx="8" ry="5" fill="' + mau + '"/><path d="M-7 0L-14 -4V4z" fill="' + mau + '"/><circle cx="4" cy="-1.5" r="1.2" fill="#2b2b2b"/>';
+                  if (ngu) h += '<g transform="translate(' + (24 + i * 12) + ',62)" opacity=".55">' + than + '<text x="5" y="-8" font-size="7" font-weight="700" fill="currentColor" class="zz">z</text></g>';
+                  else h += '<g transform="translate(0,' + (20 + (i * 13) % 34) + ')"><g class="ca-boi" style="animation-duration:' + (9 + (i * 5) % 8) + 's;animation-delay:-' + (i * 3.1).toFixed(1) + 's">' + than + '</g></g>';
+              }
+              g.innerHTML = h;
+              const t = document.querySelector(".ho-ca title");
+              if (t) t.textContent = "Bể cá: " + (st.ca - st.ngu) + " con đang bơi" + (st.ngu ? ", " + st.ngu + " con đang ngủ" : "");
+          }
+
+
+          // ---- Mèo: mắt dõi theo chuột, ngáp, canh Pomodoro, ngủ khi bị bấm liên tục ----
+          let chuotXY = null, chuotRaf = 0, meoDem = 0, meoLan = 0;
+          document.addEventListener("mousemove", function(e) {
+              chuotXY = [e.clientX, e.clientY];
+              if (!chuotRaf) chuotRaf = requestAnimationFrame(function() { chuotRaf = 0; meoNhin(); });
+          });
+          function meoNhin() {
+              const m = document.getElementById("meo"), mo = m && m.querySelector(".m-mo");
+              if (!mo || !chuotXY) return;
+              const r = m.getBoundingClientRect();
+              if (!r.width) return;
+              const dx = Math.max(-1, Math.min(1, (chuotXY[0] - (r.left + r.width * 0.77)) / 300));
+              const dy = Math.max(-1, Math.min(1, (chuotXY[1] - (r.top + r.height * 0.57)) / 300));
+              mo.style.transform = "translate(" + (dx * 2.2) + "px," + (dy * 1.6) + "px)";
+          }
+          function meoNgap() { meoDoi("ngap", 1700); setTimeout(meoVuon, 1500); }
+          function meoNgu() { meoDoi("ngu-tam", 9000); meoNoi("Zzz... để mình ngủ chút nhé.", 5000); }
+
+          // ---- Bể cá: bong bóng, rải thức ăn ----
+          let caVuiT;
+          function caVui(ms) {
+              const h = document.querySelector(".ho-ca");
+              if (!h) return;
+              h.classList.add("an");
+              clearTimeout(caVuiT);
+              caVuiT = setTimeout(() => h.classList.remove("an"), ms || 3500);
+          }
+          function taoBot() {
+              const g = document.getElementById("ca-bot");
+              if (!g || g.querySelector(".bot")) return;
+              [22, 27, 60, 82, 100, 108].forEach(function(x, i) {
+                  const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                  c.setAttribute("class", "bot"); c.setAttribute("cx", x); c.setAttribute("cy", 64);
+                  c.setAttribute("r", (1.2 + (i % 3) * 0.5).toFixed(1)); c.setAttribute("fill", "none");
+                  c.setAttribute("stroke", "#fff"); c.setAttribute("stroke-opacity", ".8");
+                  c.style.animationDelay = "-" + (i * 0.8).toFixed(1) + "s"; c.style.animationDuration = (3.6 + i * 0.5) + "s";
+                  g.appendChild(c);
+              });
+          }
+          function choCaAn() {
+              const g = document.getElementById("ca-bot");
+              if (!g) return;
+              for (let i = 0; i < 5; i++) {
+                  const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                  c.setAttribute("class", "thuc-an"); c.setAttribute("cx", 20 + Math.random() * 90); c.setAttribute("cy", 12);
+                  c.setAttribute("r", "1.7"); c.setAttribute("fill", "#a8743a"); c.style.animationDelay = (i * 0.18) + "s";
+                  g.appendChild(c);
+                  setTimeout(() => c.remove(), 3400);
+              }
+              caVui(3500);
+          }
+
+          // ---- Lọ, chồng sách, chậu cây ----
+          function pulse(id, cls, ms) {
+              const e = document.getElementById(id);
+              if (!e) return;
+              e.classList.remove(cls); void e.getBoundingClientRect(); e.classList.add(cls);
+              setTimeout(() => e.classList.remove(cls), ms);
+          }
+          function lacLo() { pulse("hu", "lac", 900); }
+          function cayNhich() { pulse("cay", "lon", 1100); }
+          function tuoiCay() {
+              const c = document.getElementById("cay");
+              if (!c) return;
+              for (let i = 0; i < 7; i++) {
+                  const d = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                  d.setAttribute("class", "giot"); d.setAttribute("cx", 35 + Math.random() * 70); d.setAttribute("cy", -6);
+                  d.setAttribute("r", "2.2"); d.setAttribute("fill", "#6ec1e4"); d.style.animationDelay = (Math.random() * 0.5) + "s";
+                  c.appendChild(d);
+                  setTimeout(() => d.remove(), 1800);
+              }
+              cayNhich();
+          }
+          function hgLat() { pulse("hg", "lat", 900); }
+
+          // ---- Bữa tiệc khi xong task: cây nhích lớn, cá bơi nhanh (mèo, bi, sách đã có sẵn) ----
+          function tiecXong() { cayNhich(); caVui(2500); }
+
+          // ---- Giờ ngủ (21h - 5h): đom đóm nhiều hơn, màn hình ấm dịu, thông báo nhỏ lại; đúng 21h mèo ngáp và đèn bàn tự bật chế độ tối ----
+          let gioNguHT = null;
+          function veGioNgu() {
+              const h = new Date().getHours(), ngu = h >= 21 || h < 5;
+              if (ngu === gioNguHT) return;
+              const lanDau = gioNguHT === null;
+              gioNguHT = ngu;
+              document.body.classList.toggle("gio-ngu", ngu);
+              if (ngu && !lanDau) {
+                  meoNgap(); meoNoi("Khuya rồi, nghỉ thôi nào.", 6000);
+                  if (!document.body.classList.contains("dark")) batTatDarkMode();
+              }
+          }
+
+
+
+          donDepHu(); veCuaSo(); veHu(); veSach();
+          taoDomDom(); veDip(); donDepCa(); veCa(); taoBot(); veGioNgu(); meoNhin(); veToLich(); capNhatDen(); setTimeout(meoCanhBao, 1500);
+          setInterval(function() { veCuaSo(); veToLich(); veSach(); veCa(); veDip(); veGioNgu(); }, 60 * 1000);
 
           veHeader();
           _init();
@@ -3556,6 +3923,8 @@
               try { localStorage.setItem("todos", JSON.stringify(danhSachData)); } catch (e) {}
               window.danhSachData = danhSachData;
               if (typeof window.syncToCloud === "function") window.syncToCloud("todos");
+              donDepHu();   // mọi lần lưu (xoá lẻ, xoá hàng loạt, xoá vĩnh viễn, khôi phục file...) đều dọn bi/sách mồ côi
+              donDepCa();   // và dọn cá của những ngày không còn đủ task đã xong
           }
 
           function nhimEnter(event) {
